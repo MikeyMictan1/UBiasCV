@@ -14,10 +14,11 @@
 4) Open the localhost link, and everything should be working!
 
 ### Backend Setup
-1) Create a python 3.12 `venv` and activate it: `py -3.12 -m venv venv` then `.\venv\Scripts\Activate.ps1` or `.\venv\bin\activate`
-2) Install the reqs in requirements.txt `pip install -r requirements.txt`
-3) Add `env` file to the `backend` folder
-4) Run `python -m BiasAI.main` and everything should be working
+1) `cd` into backend folder
+2) Create a python 3.12 `venv` and activate it: `py -3.12 -m venv venv` then `.\venv\Scripts\Activate.ps1` or `.\venv\bin\activate`
+3) Install the reqs in requirements.txt `pip install -r requirements.txt`
+4) Add `env` file to the `backend` folder
+5) Run `python -m BiasAI.main` and everything should be working
 
 To run the auto-formatter, just run `black .` and the files will be auto-formatted to best practices.
 
@@ -31,9 +32,10 @@ To run the auto-formatter, just run `black .` and the files will be auto-formatt
 - HTML
 - React
 - TypeScript
+- Vite + Node.js
 
 ### Backend
 - Python + FastAPI
-- OpenAI API
-- Vite + Node.js
+- Black formatter
+- Claude API
 - Vercel (Deployment)
