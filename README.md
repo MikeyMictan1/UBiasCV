@@ -1,7 +1,7 @@
 <div align="center">
   
 # Uni AI Bias Detection Tool
-**Uni AI Bias Detection Tool | Backed by IBM & Lenovo, for the Responsible AI Consortium (RAIC).**
+**A tool to detect bias from AI career guidance feedback to students CVs | Backed by IBM & Lenovo, for the Responsible AI Consortium (RAIC).**
 
 </div>
 
