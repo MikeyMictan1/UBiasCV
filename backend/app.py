@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from BiasAI.controller import router as bias_router
 
-app = FastAPI(title="University Admissions Bias Toolkit")
+app = FastAPI(title="University CV Bias Toolkit")
 
 # Open CORS for the prototype (Vite dev server, etc.)
 app.add_middleware(
