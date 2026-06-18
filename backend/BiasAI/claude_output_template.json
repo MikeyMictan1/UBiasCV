@@ -1,0 +1,11 @@
+{
+    "score": 0.0,
+    "summary" : "The AI output showed x things which are biased",
+    "flagged_phrases" : [
+        {
+            "phrase": "x things",
+            "reason": "This phrase is vague and could be interpreted in a biased way."
+        }
+    ],
+    "next_steps" : "For students: Take X and Y parts with a grain of salt.For the tool creators: X and Y features should be reviewed."
+}

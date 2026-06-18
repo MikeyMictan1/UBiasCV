@@ -10,9 +10,11 @@ import { useRef, useState } from 'react'
 interface FileUploadProps {
   step: number
   label: string
+  // Reports the chosen file (or null) up to the parent
+  onFileSelect: (file: File | null) => void
 }
 
-function FileUpload({ step, label }: FileUploadProps) {
+function FileUpload({ step, label, onFileSelect }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [fileName, setFileName] = useState<string | null>(null)
 
@@ -65,7 +67,11 @@ function FileUpload({ step, label }: FileUploadProps) {
         type="file"
         accept=".pdf,.docx,.txt"
         className="hidden"
-        onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
+        onChange={(e) => {
+          const file = e.target.files?.[0] ?? null
+          setFileName(file?.name ?? null)
+          onFileSelect(file)
+        }}
       />
     </div>
   )

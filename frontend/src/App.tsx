@@ -10,22 +10,29 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import MainPage from './components/MainPage'
 import ResultsPage from './components/ResultsPage'
+import type { BiasReport } from './types'
 
 type PageName = 'main' | 'results'
 
 function App() {
   const [page, setPage] = useState<PageName>('main')
+  const [report, setReport] = useState<BiasReport | null>(null)
 
   return (
     <div className="min-h-screen bg-[#E2E2E2]">
       <Header
-        title={page === 'main' ? 'University Admissions Bias Toolkit' : 'Bias Report'}
+        title={page === 'main' ? 'University CV Bias Toolkit' : 'Bias Report'}
       />
 
-      {page === 'main' ? (
-        <MainPage onGenerate={() => setPage('results')} />
+      {page === 'main' || !report ? (
+        <MainPage
+          onGenerate={(generated) => {
+            setReport(generated)
+            setPage('results')
+          }}
+        />
       ) : (
-        <ResultsPage onBack={() => setPage('main')} />
+        <ResultsPage report={report} onBack={() => setPage('main')} />
       )}
 
       <Footer />
