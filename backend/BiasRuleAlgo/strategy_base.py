@@ -20,7 +20,7 @@ class BiasStrategy(abc.ABC):
     """
 
     @abc.abstractmethod
-    def analyse(self, text: str) -> BiasStrategyOutput:
+    def analyse(self, cv_text: str, feedback_text: str) -> BiasStrategyOutput:
         """
         Analyse the given text and return a BiasStrategyOutput object.
 

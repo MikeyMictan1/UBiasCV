@@ -7,6 +7,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from BiasAI.extract import extract_text
 from BiasAI.models import BiasReport
 from BiasAI.service import generate_bias_report
+from BiasRuleAlgo.rba import run_strategies
 
 router = APIRouter(prefix="/api", tags=["bias"])
 
@@ -22,6 +23,8 @@ async def analyze(
 ) -> BiasReport:
     cv_text = extract_text(cv)
     feedback_text = extract_text(ai_feedback)
+
+    strategy_results = run_strategies(cv_text, feedback_text)
 
     if not cv_text.strip() or not feedback_text.strip():
         raise HTTPException(

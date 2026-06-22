@@ -6,7 +6,7 @@ class LexiconChecker(BiasStrategy):
     LexiconChecker is a strategy that checks the presence of specific lexicons in a given text.
     """
 
-    def analyse(self, text: str) -> BiasStrategyOutput:
+    def analyse(self, cv_text: str, feedback_text: str) -> BiasStrategyOutput:
         """
         Analyse the given text and return a BiasStrategyOutput object.
 
