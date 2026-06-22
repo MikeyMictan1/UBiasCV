@@ -1,5 +1,6 @@
 from ..strategy_base import BiasStrategy, BiasStrategyOutput
 
+
 class CareerGapPenalty(BiasStrategy):
     """
     CareerGapPenalty is a strategy that evaluates the career gap penalty in a given text.
@@ -16,4 +17,6 @@ class CareerGapPenalty(BiasStrategy):
         score = 0  # Replace with actual scoring logic
         evidence = []  # Replace with actual evidence collection logic
 
-        return BiasStrategyOutput(strategy="CareerGapPenalty", score=score, evidence=evidence)
+        return BiasStrategyOutput(
+            strategy="CareerGapPenalty", score=score, evidence=evidence
+        )

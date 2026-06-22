@@ -1,5 +1,6 @@
 from ..strategy_base import BiasStrategy, BiasStrategyOutput
 
+
 class HiddenCeilingEngine(BiasStrategy):
     """
     HiddenCeilingEngine is a strategy that evaluates the hidden ceiling effect in a given text.
@@ -16,4 +17,6 @@ class HiddenCeilingEngine(BiasStrategy):
         score = 0  # Replace with actual scoring logic
         evidence = []  # Replace with actual evidence collection logic
 
-        return BiasStrategyOutput(strategy="HiddenCeilingEngine", score=score, evidence=evidence)
+        return BiasStrategyOutput(
+            strategy="HiddenCeilingEngine", score=score, evidence=evidence
+        )

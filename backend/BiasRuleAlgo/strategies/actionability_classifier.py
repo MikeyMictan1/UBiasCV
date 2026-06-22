@@ -1,5 +1,6 @@
 from ..strategy_base import BiasStrategy, BiasStrategyOutput
 
+
 class ActionabilityClassifier(BiasStrategy):
     """
     ActionabilityClassifier is a strategy that classifies the actionability of a given text.
@@ -16,4 +17,6 @@ class ActionabilityClassifier(BiasStrategy):
         score = 0  # Replace with actual scoring logic
         evidence = []  # Replace with actual evidence collection logic
 
-        return BiasStrategyOutput(strategy="ActionabilityClassifier", score=score, evidence=evidence)
+        return BiasStrategyOutput(
+            strategy="ActionabilityClassifier", score=score, evidence=evidence
+        )

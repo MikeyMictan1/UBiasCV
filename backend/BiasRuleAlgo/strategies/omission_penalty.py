@@ -1,5 +1,6 @@
 from ..strategy_base import BiasStrategy, BiasStrategyOutput
 
+
 class OmissionPenalty(BiasStrategy):
     """
     OmissionPenalty is a strategy that evaluates the omission penalty in a given text.
@@ -16,4 +17,6 @@ class OmissionPenalty(BiasStrategy):
         score = 0  # Replace with actual scoring logic
         evidence = []  # Replace with actual evidence collection logic
 
-        return BiasStrategyOutput(strategy="OmissionPenalty", score=score, evidence=evidence)
+        return BiasStrategyOutput(
+            strategy="OmissionPenalty", score=score, evidence=evidence
+        )

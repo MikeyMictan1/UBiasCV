@@ -1,5 +1,6 @@
 from ..strategy_base import BiasStrategy, BiasStrategyOutput
 
+
 class LexiconChecker(BiasStrategy):
     """
     LexiconChecker is a strategy that checks the presence of specific lexicons in a given text.
@@ -16,4 +17,6 @@ class LexiconChecker(BiasStrategy):
         score = 0  # Replace with actual scoring logic
         evidence = []  # Replace with actual evidence collection logic
 
-        return BiasStrategyOutput(strategy="LexiconChecker", score=score, evidence=evidence)
+        return BiasStrategyOutput(
+            strategy="LexiconChecker", score=score, evidence=evidence
+        )
