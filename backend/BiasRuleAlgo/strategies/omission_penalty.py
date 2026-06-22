@@ -6,7 +6,7 @@ class OmissionPenalty(BiasStrategy):
     OmissionPenalty is a strategy that evaluates the omission penalty in a given text.
     """
 
-    def analyse(self, text: str) -> BiasStrategyOutput:
+    def analyse(self, cv_text: str, feedback_text: str) -> BiasStrategyOutput:
         """
         Analyse the given text and return a BiasStrategyOutput object.
 

@@ -14,7 +14,7 @@ modules = [
 
 
 # Runs the strategies on the given text, will change as needed. Can plug in any strategies as needed as we are loosely coupled strategies with the strategy pattern.
-def run_strategies(text: str):
+def run_strategies(cv_text: str, feedback_text: str):
     results = []
     for module in modules:
         result = module.analyse(text)
