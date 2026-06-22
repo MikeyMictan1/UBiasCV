@@ -1,7 +1,7 @@
 // ============================================================
 // Header
 // Blue banner shown at the top of every page. The title changes
-// per page ("University Admissions Bias Toolkit" / "Bias Report").
+// per page ("University CV Bias Toolkit" / "Bias Report").
 // The angled shapes are done with simple CSS clip-paths.
 // ============================================================
 

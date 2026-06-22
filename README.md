@@ -19,6 +19,7 @@
 3) Install the reqs in requirements.txt `pip install -r requirements.txt`
 4) Add `env` file to the `backend` folder
 5) Run `python -m BiasAI.main` and everything should be working
+6) `uvicorn app:app --reload --port 8000` Starts the backend connection
 
 To run the auto-formatter, just run `black .` and the files will be auto-formatted to best practices.
 

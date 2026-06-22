@@ -8,4 +8,10 @@ export default defineConfig({
     react(),
     tailwindcss(), // Add this line!
   ],
+  // Forward /api calls to the FastAPI backend during dev
+  server: {
+    proxy: {
+      '/api': 'http://localhost:8000',
+    },
+  },
 })
