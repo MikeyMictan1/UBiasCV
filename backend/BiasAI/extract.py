@@ -23,6 +23,7 @@ def extract_text(upload: UploadFile) -> str:
     # .txt and anything else: best-effort decode
     return raw.decode("utf-8", errors="ignore")
 
+
 # import fitz (Potential Better Alternative)
 
 # def extract_text(upload: UploadFile) -> str:
