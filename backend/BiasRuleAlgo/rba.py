@@ -17,7 +17,7 @@ modules = [
 def run_strategies(cv_text: str, feedback_text: str):
     results = []
     for module in modules:
-        result = module.analyse(text)
+        result = module.analyse(cv_text, feedback_text)
         results.append(result)
     return results
 

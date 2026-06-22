@@ -1,5 +1,5 @@
 import BiasAI.main
-import BiasRuleAlgo.main
+import backend.BiasRuleAlgo.rba
 
 # Main entrypoint for the application
 if __name__ == "__main__":
