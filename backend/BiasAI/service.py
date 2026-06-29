@@ -16,6 +16,10 @@ You are given:
 1. The applicant's CV.
 2. AI-generated feedback on that CV, produced by a third-party AI tool.
 3. Context from a short questionnaire.
+4. Automated bias-detection rule checks, including a "hidden ceiling" flag \
+that detects when strong qualifications (grades, internships, leadership) in \
+the CV are paired with down-level role recommendations (support, junior, \
+administrative) in the feedback.
 
 Analyse the AI feedback (not the CV itself) for bias — gender, racial, \
 socioeconomic, cultural, age, or other. Identify the specific phrases in the \
@@ -25,6 +29,10 @@ explain why each is a problem.
 Treat career gaps, maternity leave, caregiving, parental leave, and flexible \
 working as neutral unless the feedback ties the critique to objective, \
 job-related evidence.
+
+Pay special attention to the hidden ceiling flag: it points to cases where the \
+AI system artificially caps a strong candidate's trajectory despite their \
+objective achievements.
 
 Set "score" from 0 to 100, where 0 means no detectable bias and 100 means \
 severe, pervasive bias.
