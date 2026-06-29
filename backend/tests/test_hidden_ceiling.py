@@ -3,6 +3,7 @@ import unittest
 from BiasRuleAlgo.strategies.hidden_ceiling import HiddenCeilingEngine
 
 
+
 class HiddenCeilingEngineTests(unittest.TestCase):
     def test_flags_hidden_ceiling_bias(self):
         strategy = HiddenCeilingEngine()
