@@ -24,13 +24,13 @@ async def analyze(
     cv_text = extract_text(cv)
     feedback_text = extract_text(ai_feedback)
 
-    strategy_results = run_strategies(cv_text, feedback_text)
-
     if not cv_text.strip() or not feedback_text.strip():
         raise HTTPException(
             status_code=400,
             detail="Could not read text from one of the uploaded files.",
         )
+
+    strategy_results = run_strategies(cv_text, feedback_text)
 
     questionnaire = {
         "user": user,
@@ -40,7 +40,12 @@ async def analyze(
     }
 
     try:
-        report = generate_bias_report(cv_text, feedback_text, questionnaire)
+        report = generate_bias_report(
+            cv_text,
+            feedback_text,
+            questionnaire,
+            strategy_results,
+        )
     except Exception as exc:  # surface API/parse failures to the frontend
         raise HTTPException(status_code=502, detail=f"Claude API error: {exc}")
 

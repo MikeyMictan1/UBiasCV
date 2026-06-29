@@ -4,6 +4,7 @@
 
 from BiasAI.claude import client
 from BiasAI.models import BiasReport
+from BiasRuleAlgo.strategy_base import BiasStrategyOutput
 
 # Keep the model that's already configured for this project (see claude.py).
 MODEL = "claude-haiku-4-5-20251001"
@@ -21,6 +22,10 @@ socioeconomic, cultural, age, or other. Identify the specific phrases in the \
 AI feedback that are biased, vague, or could lead to unfair treatment, and \
 explain why each is a problem.
 
+Treat career gaps, maternity leave, caregiving, parental leave, and flexible \
+working as neutral unless the feedback ties the critique to objective, \
+job-related evidence.
+
 Set "score" from 0 to 100, where 0 means no detectable bias and 100 means \
 severe, pervasive bias.
 
@@ -33,8 +38,24 @@ do not flag minor or borderline cases. Keep "next_steps" to 2-3 short \
 sentences per audience. Prefer plain, direct wording over elaboration."""
 
 
+def _format_strategy_results(strategy_results: list[BiasStrategyOutput]) -> str:
+    if not strategy_results:
+        return "None"
+
+    lines = []
+    for result in strategy_results:
+        evidence = "; ".join(result.evidence) if result.evidence else "none"
+        lines.append(
+            f"- {result.strategy}: score={result.score:.0f}; evidence={evidence}"
+        )
+    return "\n".join(lines)
+
+
 def generate_bias_report(
-    cv_text: str, ai_feedback: str, questionnaire: dict
+    cv_text: str,
+    ai_feedback: str,
+    questionnaire: dict,
+    strategy_results: list[BiasStrategyOutput],
 ) -> BiasReport | None:
     user_content = f"""<questionnaire>
 Who is using the tool: {questionnaire.get("user")}
@@ -42,6 +63,10 @@ AI tool that generated the feedback: {questionnaire.get("ai_tool")}
 Course applied for: {questionnaire.get("course")}
 CV contains gendered identifiers: {questionnaire.get("gendered")}
 </questionnaire>
+
+<rule_checks>
+{_format_strategy_results(strategy_results)}
+</rule_checks>
 
 <cv>
 {cv_text}
