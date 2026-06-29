@@ -117,7 +117,11 @@ class HiddenCeilingEngine(BiasStrategy):
             evidence.extend(matched_sentences[:3])
         evidence.append(
             "CV qualification signals: "
-            + (", ".join(sorted(set(qualification_hits))) if qualification_hits else "none")
+            + (
+                ", ".join(sorted(set(qualification_hits)))
+                if qualification_hits
+                else "none"
+            )
         )
         evidence.append(
             "Down-level role language: "
@@ -129,7 +133,11 @@ class HiddenCeilingEngine(BiasStrategy):
         )
         evidence.append(
             "Upward role language present: "
-            + (", ".join(sorted(set(feedback_upward_hits))) if feedback_upward_hits else "none")
+            + (
+                ", ".join(sorted(set(feedback_upward_hits)))
+                if feedback_upward_hits
+                else "none"
+            )
         )
 
         return BiasStrategyOutput(

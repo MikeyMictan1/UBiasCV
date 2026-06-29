@@ -1,6 +1,7 @@
 """
 Integration test: verify hidden ceiling rule flows through the full pipeline.
 """
+
 import unittest
 
 from BiasRuleAlgo.rba import run_strategies
