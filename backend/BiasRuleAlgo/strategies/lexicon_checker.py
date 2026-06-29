@@ -1,5 +1,4 @@
-import re
-from strategy_base import BiasStrategy, BiasStrategyOutput
+from ..strategy_base import BiasStrategy, BiasStrategyOutput
 
 
 class LexiconChecker(BiasStrategy):
