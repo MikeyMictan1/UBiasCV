@@ -1,3 +1,4 @@
+import re
 from ..strategy_base import BiasStrategy, BiasStrategyOutput
 
 
@@ -7,17 +8,30 @@ class LexiconChecker(BiasStrategy):
     """
 
     FLAGGED_WORDS_LEADERSHIP = {
-        "assertive": 80, "aggressive": 90, "ambitious": 60, "dominant": 90,
-        "confident": 60, "nurturing": 80, "compassionate": 70,
-        "collaborative": 50, "supportive": 60,
+        "assertive": 80,
+        "aggressive": 90,
+        "ambitious": 60,
+        "dominant": 90,
+        "confident": 60,
+        "nurturing": 80,
+        "compassionate": 70,
+        "collaborative": 50,
+        "supportive": 60,
     }
     FLAGGED_WORDS_ACHIEVEMENT = {
-        "brilliant": 70, "genius": 80, "logical": 60,
-        "hardworking": 40, "diligent": 40, "organized": 40,
+        "brilliant": 70,
+        "genius": 80,
+        "logical": 60,
+        "hardworking": 40,
+        "diligent": 40,
+        "organized": 40,
     }
     FLAGGED_WORDS_APPEARANCE = {
-        "beautiful": 90, "pretty": 90, "strong": 50,
-        "powerful": 60, "attractive": 80,
+        "beautiful": 90,
+        "pretty": 90,
+        "strong": 50,
+        "powerful": 60,
+        "attractive": 80,
     }
 
     def analyse(self, cv_text: str, feedback_text: str) -> BiasStrategyOutput:
@@ -38,7 +52,9 @@ class LexiconChecker(BiasStrategy):
                 evidence.append(self._snippet(feedback_text, word))
 
         score = self._compute_score(severities)
-        return BiasStrategyOutput(strategy="LexiconChecker", score=score, evidence=evidence)
+        return BiasStrategyOutput(
+            strategy="LexiconChecker", score=score, evidence=evidence
+        )
 
     def _snippet(self, text: str, word: str, window: int = 40) -> str:
         idx = text.lower().find(word)
