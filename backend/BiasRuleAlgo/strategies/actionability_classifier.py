@@ -231,9 +231,7 @@ class ActionabilityClassifier(BiasStrategy):
 
         score = round((actionable_count / len(sentences)) * 100)
         evidence = classified_sentences
-        evidence.append(
-            f"Actionable sentences: {actionable_count}/{len(sentences)}"
-        )
+        evidence.append(f"Actionable sentences: {actionable_count}/{len(sentences)}")
         evidence.append(
             "Actionable categories: " + ", ".join(sorted(ACTIONABLE_CATEGORIES))
         )

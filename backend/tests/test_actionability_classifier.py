@@ -17,7 +17,10 @@ class ActionabilityClassifierTests(unittest.TestCase):
 
         self.assertEqual(result.score, 50)
         self.assertTrue(
-            any("specific career opportunity" in item.lower() for item in result.evidence)
+            any(
+                "specific career opportunity" in item.lower()
+                for item in result.evidence
+            )
         )
         self.assertTrue(
             any("salary advice" in item.lower() for item in result.evidence)
