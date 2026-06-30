@@ -7,7 +7,6 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from BiasAI.extract import extract_text
 from BiasAI.models import BiasReport
 from BiasAI.ubiasai import build_tailoring_context, generate_bias_report
-from BiasRuleAlgo.rba import run_strategies
 
 router = APIRouter(prefix="/api", tags=["bias"])
 
@@ -51,7 +50,6 @@ async def analyze(
         report = generate_bias_report(
             cv_text,
             feedback_text,
-            strategy_results,
             tailoring_context,
         )
 

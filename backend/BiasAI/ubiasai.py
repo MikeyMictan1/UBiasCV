@@ -241,9 +241,9 @@ def _format_strategy_results(strategy_results: list[BiasStrategyOutput]) -> str:
 def generate_bias_report(
     cv_text: str,
     ai_feedback: str,
-    strategy_results: list[BiasStrategyOutput],
     tailoring_context: TailoringContext,
 ) -> BiasReport | None:
+    strategy_results = run_strategies(cv_text, ai_feedback)
     user_content = f"""<tailoring_context>
 {tailoring_context.model_dump_json(indent=2)}
 </tailoring_context>
