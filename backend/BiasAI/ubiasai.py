@@ -6,7 +6,7 @@ from BiasAI.claude import client
 from BiasAI.models import BiasReport
 from BiasRuleAlgo.strategy_base import BiasStrategyOutput
 
-# Keep the model that's already configured for this project (see claude.py).
+# Keep the model that's already configured for this project
 MODEL = "claude-haiku-4-5-20251001"
 
 SYSTEM_PROMPT = """You detect bias in AI-generated feedback on university \

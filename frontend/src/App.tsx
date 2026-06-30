@@ -1,39 +1,56 @@
 // ============================================================
 // App
-// Top-level component. Holds simple page state ("main" or
-// "results") and renders the shared header/footer around the
-// active page. No router needed for a two-page prototype.
+// Top-level component. Holds the active page ("intro" | "input" |
+// "review"), the selected user role, and the generated report.
+// The shared Header (stepper nav) / Footer wrap every page.
+// No router needed for a three-page flow.
 // ============================================================
 
 import { useState } from 'react'
 import Header from './components/Header'
 import Footer from './components/Footer'
-import MainPage from './components/MainPage'
-import ResultsPage from './components/ResultsPage'
+import IntroPage from './components/IntroPage'
+import InputDataPage from './components/InputDataPage'
+import ReviewPage from './components/ReviewPage'
 import type { BiasReport } from './types'
 
-type PageName = 'main' | 'results'
+export type PageName = 'intro' | 'input' | 'review'
 
 function App() {
-  const [page, setPage] = useState<PageName>('main')
+  const [page, setPage] = useState<PageName>('intro')
+  const [user, setUser] = useState('')
   const [report, setReport] = useState<BiasReport | null>(null)
 
   return (
-    <div className="min-h-screen bg-[#E2E2E2]">
+    <div className="flex min-h-screen flex-col bg-beige font-sans text-ink">
       <Header
-        title={page === 'main' ? 'University CV Bias Toolkit' : 'Bias Report'}
+        page={page}
+        canReview={report !== null}
+        onNavigate={setPage}
       />
 
-      {page === 'main' || !report ? (
-        <MainPage
-          onGenerate={(generated) => {
-            setReport(generated)
-            setPage('results')
-          }}
-        />
-      ) : (
-        <ResultsPage report={report} onBack={() => setPage('main')} />
-      )}
+      <main className="flex-1">
+        {page === 'intro' && (
+          <IntroPage
+            onSelectUser={(selected) => {
+              setUser(selected)
+              setPage('input')
+            }}
+          />
+        )}
+
+        {page === 'input' && (
+          <InputDataPage
+            user={user}
+            onReport={(generated) => {
+              setReport(generated)
+              setPage('review')
+            }}
+          />
+        )}
+
+        {page === 'review' && report && <ReviewPage report={report} />}
+      </main>
 
       <Footer />
     </div>

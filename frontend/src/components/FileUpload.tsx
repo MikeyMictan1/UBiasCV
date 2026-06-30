@@ -1,42 +1,41 @@
 // ============================================================
 // FileUpload
-// Reusable upload box: numbered step badge + label, and a grey
-// click-to-browse area. No backend yet — the chosen file name is
-// just displayed so the user can see the selection worked.
+// Dashed "Drop or Browse" zone used inside the Input Data cards.
+// Supports click-to-browse and drag-and-drop; once a file is
+// chosen its name replaces the "Drop or Browse" label.
 // ============================================================
 
 import { useRef, useState } from 'react'
 
 interface FileUploadProps {
-  step: number
-  label: string
   // Reports the chosen file (or null) up to the parent
   onFileSelect: (file: File | null) => void
 }
 
-function FileUpload({ step, label, onFileSelect }: FileUploadProps) {
+function FileUpload({ onFileSelect }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [fileName, setFileName] = useState<string | null>(null)
 
-  return (
-    <div className="flex flex-col items-start">
-      {/* Step badge + label */}
-      <div className="mb-2 flex items-center gap-2">
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#3F51A5] text-sm font-bold text-white">
-          {step}
-        </span>
-        <span className="text-sm font-medium text-gray-800">{label}</span>
-      </div>
+  function selectFile(file: File | null) {
+    setFileName(file?.name ?? null)
+    onFileSelect(file)
+  }
 
-      {/* Clickable upload area */}
+  return (
+    <>
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="flex h-44 w-56 flex-col items-center justify-center rounded-md border border-gray-400 bg-gray-300 hover:bg-gray-200"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault()
+          selectFile(e.dataTransfer.files?.[0] ?? null)
+        }}
+        className="flex w-full flex-col items-center justify-center border-2 border-dashed border-ink/30 px-4 py-12 text-center hover:border-brand"
       >
         {/* Download-tray icon */}
         <svg
-          className="h-12 w-12 text-gray-900"
+          className="h-12 w-12 text-ink"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
@@ -49,16 +48,12 @@ function FileUpload({ step, label, onFileSelect }: FileUploadProps) {
           />
         </svg>
 
-        {/* Selected file name, or accepted-formats hint */}
-        {fileName ? (
-          <span className="mt-3 max-w-[13rem] truncate px-2 text-xs font-medium text-gray-800">
-            {fileName}
-          </span>
-        ) : (
-          <span className="mt-3 text-[10px] font-semibold text-gray-700">
-            Accepted: PDF, DOCX, TXT
-          </span>
-        )}
+        <span className="mt-3 max-w-full truncate px-2 text-2xl text-ink">
+          {fileName ?? 'Drop or Browse'}
+        </span>
+        <span className="mt-2 text-sm tracking-wider text-bodygray">
+          PDF | DOCX | TXT
+        </span>
       </button>
 
       {/* Hidden native file input */}
@@ -67,13 +62,9 @@ function FileUpload({ step, label, onFileSelect }: FileUploadProps) {
         type="file"
         accept=".pdf,.docx,.txt"
         className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0] ?? null
-          setFileName(file?.name ?? null)
-          onFileSelect(file)
-        }}
+        onChange={(e) => selectFile(e.target.files?.[0] ?? null)}
       />
-    </div>
+    </>
   )
 }
 
