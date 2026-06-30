@@ -15,6 +15,8 @@ router = APIRouter(prefix="/api", tags=["bias"])
 This function is a POST endpoint for FastAPI that takes all the required inputs from the user, 
 analyses them for bias, and returns a BiasReport.
 """
+
+
 @router.post("/analyze", response_model=BiasReport)
 async def analyze(
     cv: UploadFile = File(...),
@@ -51,7 +53,7 @@ async def analyze(
             questionnaire,
             strategy_results,
         )
-    
+
     # Error checking
     except Exception as exc:  # surface API/parse failures to the frontend
         raise HTTPException(status_code=502, detail=f"Claude API error: {exc}")
