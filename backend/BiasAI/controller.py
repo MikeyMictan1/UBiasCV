@@ -35,8 +35,7 @@ async def analyze(
             detail="Could not read text from one of the uploaded files.",
         )
 
-    # Get results from the bias analysis, and questionnaire data.
-    strategy_results = run_strategies(cv_text, feedback_text)
+    # Get questionnaire data.
     questionnaire = {
         "user": user,
         "ai_tool": ai_tool,

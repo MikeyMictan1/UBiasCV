@@ -5,6 +5,7 @@
 from BiasAI.claude import client
 from BiasAI.models import AnalysisReport, BiasReport, TailoringContext
 from BiasRuleAlgo.strategy_base import BiasStrategyOutput
+from BiasRuleAlgo.rba import run_strategies
 
 # Keep the model that's already configured for this project
 MODEL = "claude-haiku-4-5-20251001"

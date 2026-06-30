@@ -1,11 +1,25 @@
 <div align="center">
   
-# Uni AI Bias Detection Tool
-**A tool to detect bias from AI career guidance feedback to students CVs | Backed by IBM & Lenovo, for the Responsible AI Consortium (RAIC).**
+# UBiasCV
+**A tool that detects Gender Bias from AI CV Feedback | Backed by IBM & Lenovo, for the Responsible AI Consortium (RAIC).**
+
+<img width="560" height="450" alt="image" src="https://github.com/user-attachments/assets/5e9a18f0-652e-47f9-abc8-f65db5e0882d" />
 
 </div>
 
-## Running The Project
+## Using The Tool
+### 1) User: Select your purpose for using the tool
+<img width="1110" height="286" alt="image" src="https://github.com/user-attachments/assets/a539f662-66ce-423b-8e61-5e6ce68bec0c" />
+
+### 2) Input a CV and AI generated feedback about that CV, as well as answering context questions
+<img width="1118" height="711" alt="image" src="https://github.com/user-attachments/assets/a6e46a30-c629-4905-a403-91891d3cb06b" />
+
+### 3) Generate and review the Gender Bias Report
+<img width="1185" height="729" alt="image" src="https://github.com/user-attachments/assets/c71ddc92-ee03-4cc4-81be-c565669e2115" />
+
+
+
+## Running The Project (Developers)
 
 ### Frontend Setup
 1) Make sure NodeJS is installed (check if installed via `node -v` in the CLI), can be installed here:  https://nodejs.org/en/ 
@@ -23,9 +37,10 @@
 
 To run the auto-formatter, just run `black .` and the files will be auto-formatted to best practices.
 
-## Mockups
-<img width="600" height="450" alt="Frame 2" src="https://github.com/user-attachments/assets/a1130409-c2af-4899-9381-445a47699e5a" />
-<img width="600" height="450" alt="Frame 3" src="https://github.com/user-attachments/assets/7807af8e-279f-41a7-99dc-f0f1012de98c" />
+## Architecture
+<img width="2019" height="1419" alt="raic (2)" src="https://github.com/user-attachments/assets/f512f225-8bd3-4d71-a373-ecf3c2291b3f" />
+
+
 
 ## Tech Stack
 ### Frontend
