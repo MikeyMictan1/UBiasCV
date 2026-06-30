@@ -36,38 +36,40 @@ function RoleRow({ title, subtitle, onSelect }: RoleRowProps) {
 
 function IntroPage({ onSelectUser }: IntroPageProps) {
   return (
-    <div className="mx-auto w-full max-w-6xl px-10 py-8">
-      <p className="mb-3 text-base text-brand">Introduction</p>
+    <div className="py-8">
+      <div className="mx-auto w-full max-w-6xl px-10">
+        <p className="mb-3 text-base text-brand">Introduction</p>
 
-      <h1 className="mb-6 text-4xl font-bold text-brand">
-        Gender-bias assessment for AI CV feedback
-      </h1>
+        <h1 className="mb-6 text-4xl font-bold text-brand">
+          Detecting Gender Bias in AI CV Feedback Tools
+        </h1>
+        <p className="max-w-4xl text-lg text-ink">
+          ubiascv compares a CV against AI-generated feedback, and detects gender
+          bias introduced by the AI with a score, flagged phrases, and next steps.
+        </p>
+      </div>
 
-      <p className="mb-4 text-lg text-ink">Evaluates fairness of AI CV feedback.</p>
-      <p className="max-w-4xl text-lg text-ink">
-        ubiascv compares a CV against AI-generated feedback, and detects gender
-        bias introduced by the AI with a score, flagged phrases, and next steps.
-      </p>
-
-      {/* Logo banner */}
+      {/* Full-bleed logo banner */}
       <div className="my-8 flex items-center justify-center bg-brand py-10">
         <img src={logoHero} alt="ubiascv" className="h-28 w-auto" />
       </div>
 
-      <h2 className="mb-5 text-3xl font-bold text-brand">Who Is Using The Tool?</h2>
+      <div className="mx-auto w-full max-w-6xl px-10">
+        <h2 className="mb-5 text-3xl font-bold text-brand">Who Is Using The Tool?</h2>
 
-      <div className="border border-ink/25 bg-white">
-        <RoleRow
-          title="Student"
-          subtitle="I received AI CV feedback"
-          onSelect={() => onSelectUser('Student')}
-        />
-        <div className="border-t border-ink/15" />
-        <RoleRow
-          title="Tool Developer"
-          subtitle="I build an AI CV feedback tool"
-          onSelect={() => onSelectUser('Tool Developer')}
-        />
+        <div className="border border-ink/25 bg-white">
+          <RoleRow
+            title="Student"
+            subtitle="I received AI CV feedback"
+            onSelect={() => onSelectUser('Student')}
+          />
+          <div className="border-t border-ink/15" />
+          <RoleRow
+            title="Tool Developer"
+            subtitle="I build an AI CV feedback tool"
+            onSelect={() => onSelectUser('Tool Developer')}
+          />
+        </div>
       </div>
     </div>
   )

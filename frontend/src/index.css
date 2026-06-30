@@ -1,8 +1,38 @@
 @import "tailwindcss";
 
+/* ---- Outfit (self-hosted, SIL OFL — see assets/fonts/OFL.txt) ---- */
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./assets/fonts/Outfit-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./assets/fonts/Outfit-Medium.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./assets/fonts/Outfit-SemiBold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./assets/fonts/Outfit-Bold.ttf") format("truetype");
+}
+
 /* ---- ubiascv design tokens (sampled from the mockups) ---- */
 @theme {
-  --font-sans: "Quicksand", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: "Outfit", ui-sans-serif, system-ui, -apple-system, sans-serif;
 
   --color-cream: #faf9ed; /* header / footer bar */
   --color-beige: #f1efe2; /* page background */
