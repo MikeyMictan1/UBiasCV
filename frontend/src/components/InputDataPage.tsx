@@ -129,8 +129,16 @@ function InputDataPage({ user, onReport }: InputDataPageProps) {
     try {
       const res = await fetch('/api/analyze', { method: 'POST', body: form })
       if (!res.ok) {
-        const detail = await res.json().catch(() => null)
-        throw new Error(detail?.detail ?? `Request failed (${res.status})`)
+        const body = await res.json().catch(() => null)
+        const detail = body?.detail
+        // FastAPI sends a string for HTTPExceptions (400/502) but an array of
+        // {loc, msg} objects for 422 validation errors — handle both.
+        const message = Array.isArray(detail)
+          ? detail.map((e) => `${e.loc?.slice(1).join('.')}: ${e.msg}`).join('; ')
+          : typeof detail === 'string'
+            ? detail
+            : `Request failed (${res.status})`
+        throw new Error(message)
       }
       const report = await res.json()
       onReport(report)
