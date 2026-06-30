@@ -1,11 +1,11 @@
 <div align="center">
   
-# Uni AI Bias Detection Tool
-**A tool to detect bias from AI career guidance feedback to students CVs | Backed by IBM & Lenovo, for the Responsible AI Consortium (RAIC).**
+# UBiasAI
+**A tool that detects Gender Bias from AI CV Feedback | Backed by IBM & Lenovo, for the Responsible AI Consortium (RAIC).**
 
 </div>
 
-## Running The Project
+## Running The Project (Devlopers)
 
 ### Frontend Setup
 1) Make sure NodeJS is installed (check if installed via `node -v` in the CLI), can be installed here:  https://nodejs.org/en/ 
@@ -22,10 +22,6 @@
 6) `uvicorn app:app --reload --port 8000` Starts the backend connection
 
 To run the auto-formatter, just run `black .` and the files will be auto-formatted to best practices.
-
-## Mockups
-<img width="600" height="450" alt="Frame 2" src="https://github.com/user-attachments/assets/a1130409-c2af-4899-9381-445a47699e5a" />
-<img width="600" height="450" alt="Frame 3" src="https://github.com/user-attachments/assets/7807af8e-279f-41a7-99dc-f0f1012de98c" />
 
 ## Tech Stack
 ### Frontend
