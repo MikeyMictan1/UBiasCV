@@ -49,7 +49,7 @@ function App() {
           />
         )}
 
-        {page === 'review' && report && <ReviewPage report={report} />}
+        {page === 'review' && report && <ReviewPage report={report} user={user} />}
       </main>
 
       <Footer />

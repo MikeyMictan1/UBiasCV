@@ -31,7 +31,7 @@ function SectionHeading({ title }: { title: string }) {
   )
 }
 
-function ReviewPage({ report }: { report: BiasReport }) {
+function ReviewPage({ report }: { report: BiasReport; user: string }) {
   const score = Math.round(report.score)
   const color = scoreColor(score)
 
@@ -63,12 +63,14 @@ function ReviewPage({ report }: { report: BiasReport }) {
       ) : (
         <ul className="mb-10 mt-4 space-y-4">
           {report.flagged_phrases.map((item, i) => (
-            <li key={i} className="flex gap-3 text-lg">
-              <span className="text-ink">•</span>
-              <p>
+            <li key={i} className="border border-ink/15 bg-white p-4 text-lg">
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="font-semibold text-ink">“{item.phrase}”</span>
-                <span className="ml-3 text-bodygray">{item.reason}</span>
-              </p>
+                <span className="border border-brand/30 px-2 py-0.5 text-xs uppercase tracking-wider text-brand">
+                  {item.confidence} confidence
+                </span>
+              </div>
+              <p className="mt-2 text-bodygray">{item.reason}</p>
             </li>
           ))}
         </ul>

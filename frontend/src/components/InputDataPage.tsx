@@ -39,7 +39,7 @@ const COURSES = [
   'Education',
   'Other',
 ]
-const GENDERED_OPTIONS = ['Yes', 'No', 'Unsure']
+const GENDERED_OPTIONS = ['Yes', 'No', 'Unsure', 'Prefer not to say']
 
 const PLACEHOLDER = '- SELECT -'
 
@@ -68,12 +68,14 @@ interface FieldProps {
   options: string[]
   value: string
   onChange: (value: string) => void
+  helper?: string
 }
 
-function Field({ label, options, value, onChange }: FieldProps) {
+function Field({ label, options, value, onChange, helper }: FieldProps) {
   return (
     <div className="flex flex-col">
       <label className="mb-2 text-sm tracking-wider text-bodygray">{label}</label>
+      {helper && <p className="mb-2 text-sm text-bodygray">{helper}</p>}
       <div className="relative">
         <select
           value={value}
@@ -166,6 +168,10 @@ function InputDataPage({ user, onReport }: InputDataPageProps) {
       {/* Context */}
       <div className="mt-8">
         <Card num="03" title="Context">
+          <p className="mb-5 text-sm text-bodygray">
+            These details help tailor the analysis and the recommendations that
+            follow.
+          </p>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             <Field
               label="AI TOOL USED"
@@ -180,12 +186,14 @@ function InputDataPage({ user, onReport }: InputDataPageProps) {
               onChange={setCourse}
             />
             <Field
-              label="GENDER IDENTIFIERS IN THE CV?"
+              label="GENDERED IDENTIFIERS OR LANGUAGE?"
               options={GENDERED_OPTIONS}
               value={gendered}
               onChange={setGendered}
+            // helper="Optional. Use this to flag whether the CV includes gender-coded wording or identifiers." Research says this is a sensitive question and that we should make it a netral option with an explicit helper line?
             />
           </div>
+
         </Card>
       </div>
 
