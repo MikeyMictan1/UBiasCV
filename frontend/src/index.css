@@ -1,1 +1,17 @@
 @import "tailwindcss";
+
+/* ---- ubiascv design tokens (sampled from the mockups) ---- */
+@theme {
+  --font-sans: "Quicksand", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --color-cream: #faf9ed; /* header / footer bar */
+  --color-beige: #f1efe2; /* page background */
+  --color-brand: #1d588f; /* primary blue: headings, nav, accents */
+  --color-ink: #262626; /* dark text / logo charcoal */
+  --color-bodygray: #6f6e68; /* body copy */
+  --color-coral: #ff5d60; /* high-bias red */
+}
+
+body {
+  font-family: var(--font-sans);
+}
