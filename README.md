@@ -8,7 +8,7 @@
 ## Running The Project
 
 ### Frontend Setup
-1) Make sure NodeJS is installed (check if installed via `node -v` in the CLI), can be installed here:  https://nodejs.org/en/ 
+1) Make sure NodeJS is installed (check if installed via `node -v` in the CLI), can be installed here:  https://nodejs.org/en/
 2) In the `frontend` folder, run `npm install`
 3) Also in the `frontend` folder, run `npm run dev`
 4) Open the localhost link, and everything should be working!

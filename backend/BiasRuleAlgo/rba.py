@@ -1,8 +1,8 @@
-from strategies.lexicon_checker import LexiconChecker
-from strategies.hidden_ceiling import HiddenCeilingEngine
-from strategies.omission_penalty import OmissionPenalty
-from strategies.actionability_classifier import ActionabilityClassifier
-from strategies.career_gap import CareerGapPenalty
+from .strategies.lexicon_checker import LexiconChecker
+from .strategies.hidden_ceiling import HiddenCeilingEngine
+from .strategies.omission_penalty import OmissionPenalty
+from .strategies.actionability_classifier import ActionabilityClassifier
+from .strategies.career_gap import CareerGapPenalty
 
 modules = [
     LexiconChecker(),
