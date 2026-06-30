@@ -5,6 +5,7 @@
 from BiasAI.claude import client
 from BiasAI.models import BiasReport
 from BiasRuleAlgo.strategy_base import BiasStrategyOutput
+from BiasRuleAlgo.rba import run_strategies
 
 # Keep the model that's already configured for this project
 MODEL = "claude-haiku-4-5-20251001"
@@ -60,11 +61,9 @@ def _format_strategy_results(strategy_results: list[BiasStrategyOutput]) -> str:
 
 
 def generate_bias_report(
-    cv_text: str,
-    ai_feedback: str,
-    questionnaire: dict,
-    strategy_results: list[BiasStrategyOutput],
+    cv_text: str, ai_feedback: str, questionnaire: dict
 ) -> BiasReport | None:
+    strategy_results = run_strategies(cv_text, ai_feedback)
     user_content = f"""<questionnaire>
 Who is using the tool: {questionnaire.get("user")}
 AI tool that generated the feedback: {questionnaire.get("ai_tool")}

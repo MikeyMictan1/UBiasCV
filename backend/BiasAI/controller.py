@@ -7,7 +7,6 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from BiasAI.extract import extract_text
 from BiasAI.models import BiasReport
 from BiasAI.ubiasai import generate_bias_report
-from BiasRuleAlgo.rba import run_strategies
 
 router = APIRouter(prefix="/api", tags=["bias"])
 
@@ -36,8 +35,7 @@ async def analyze(
             detail="Could not read text from one of the uploaded files.",
         )
 
-    # Get results from the bias analysis, and questionnaire data.
-    strategy_results = run_strategies(cv_text, feedback_text)
+    # Get questionnaire data.
     questionnaire = {
         "user": user,
         "ai_tool": ai_tool,
@@ -47,12 +45,7 @@ async def analyze(
 
     # Generate the report
     try:
-        report = generate_bias_report(
-            cv_text,
-            feedback_text,
-            questionnaire,
-            strategy_results,
-        )
+        report = generate_bias_report(cv_text, feedback_text, questionnaire)
 
     # Error checking
     except Exception as exc:  # surface API/parse failures to the frontend
