@@ -156,6 +156,7 @@ def _role_tailoring(tailoring_context: TailoringContext) -> str:
 - Keep the explanation plain and reassuring without minimizing the issue.
 - Focus on what to trust, what to question, and what to do next."""
 
+
 SYSTEM_PROMPT = """You detect bias in AI-generated feedback on university \
 admissions documents (CVs).
 
@@ -279,4 +280,6 @@ Analyse the AI feedback for bias and produce a structured report."""
         messages=[{"role": "user", "content": user_content}],
         output_format=AnalysisReport,
     )
-    return BiasReport(**response.parsed_output.model_dump(), tailoring_context=tailoring_context)
+    return BiasReport(
+        **response.parsed_output.model_dump(), tailoring_context=tailoring_context
+    )
