@@ -136,6 +136,7 @@ def _build_domain_profile(course: str | None) -> tuple[str, str]:
         ),
     )
 
+
 SYSTEM_PROMPT = """You detect bias in AI-generated feedback on university \
 admissions documents (CVs).
 
@@ -191,7 +192,9 @@ def generate_bias_report(
 ) -> BiasReport | None:
     strategy_results = run_strategies(cv_text, ai_feedback)
     tool_profile_name, tool_guidance = _build_tool_profile(questionnaire.get("ai_tool"))
-    domain_profile_name, domain_guidance = _build_domain_profile(questionnaire.get("course"))
+    domain_profile_name, domain_guidance = _build_domain_profile(
+        questionnaire.get("course")
+    )
     user_content = f"""<questionnaire>
 Who is using the tool: {questionnaire.get("user")}
 AI tool that generated the feedback: {questionnaire.get("ai_tool")}
