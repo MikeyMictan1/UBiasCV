@@ -18,26 +18,42 @@ interface InputDataPageProps {
 
 // ---------- Questionnaire options ----------
 const AI_TOOLS = ['VMock', 'ChatGPT', 'Claude', 'Gemini', 'Copilot', 'Other']
-const COURSES = [
-  'Art',
-  'History',
-  'Liberal Arts',
-  'Computer Science',
-  'Engineering',
-  'Medicine',
-  'Law',
-  'Business',
-  'Psychology',
-  'Sociology',
-  'Economics',
-  'Political Science',
-  'Philosophy',
-  'Mathematics',
-  'Physics',
-  'Chemistry',
-  'Biology',
-  'Education',
-  'Other',
+const COURSE_GROUPS = [
+  {
+    label: 'Arts & Humanities',
+    options: ['Art', 'History', 'Liberal Arts', 'Philosophy'],
+  },
+  {
+    label: 'STEM',
+    options: [
+      'Computer Science',
+      'Engineering',
+      'Mathematics',
+      'Physics',
+      'Chemistry',
+      'Biology',
+    ],
+  },
+  {
+    label: 'Health',
+    options: ['Medicine'],
+  },
+  {
+    label: 'Professional Studies',
+    options: ['Law', 'Business'],
+  },
+  {
+    label: 'Social Sciences',
+    options: ['Psychology', 'Sociology', 'Economics', 'Political Science'],
+  },
+  {
+    label: 'Education',
+    options: ['Education'],
+  },
+  {
+    label: 'Other',
+    options: ['Other'],
+  },
 ]
 const GENDERED_OPTIONS = ['Yes', 'No', 'Unsure']
 
@@ -65,12 +81,13 @@ function Card({ num, title, children }: CardProps) {
 // ---------- Labelled dropdown ----------
 interface FieldProps {
   label: string
-  options: string[]
+  options?: string[]
+  groups?: { label: string; options: string[] }[]
   value: string
   onChange: (value: string) => void
 }
 
-function Field({ label, options, value, onChange }: FieldProps) {
+function Field({ label, options, groups, value, onChange }: FieldProps) {
   return (
     <div className="flex flex-col">
       <label className="mb-2 text-sm tracking-wider text-bodygray">{label}</label>
@@ -81,11 +98,21 @@ function Field({ label, options, value, onChange }: FieldProps) {
           className="w-full appearance-none border border-ink/30 bg-white px-3 py-2 pr-10 text-ink focus:border-brand focus:outline-none"
         >
           <option value="">{PLACEHOLDER}</option>
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
+          {groups
+            ? groups.map((group) => (
+              <optgroup key={group.label} label={group.label}>
+                {group.options.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </optgroup>
+            ))
+            : options?.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
         </select>
         <svg
           className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand"
@@ -175,7 +202,7 @@ function InputDataPage({ user, onReport }: InputDataPageProps) {
             />
             <Field
               label="AREA OF WORK/STUDY"
-              options={COURSES}
+              groups={COURSE_GROUPS}
               value={course}
               onChange={setCourse}
             />
