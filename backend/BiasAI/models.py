@@ -5,14 +5,30 @@
 from pydantic import BaseModel
 
 
+class TailoringContext(BaseModel):
+    user_role: str
+    ai_tool: str
+    domain: str
+    domain_rubric: str
+    tool_profile: str
+    gendered_language: str
+    review_depth: str
+
+
 class FlaggedPhrase(BaseModel):
     phrase: str
     reason: str
+    evidence_snippet: str
+    confidence: str
 
 
-class BiasReport(BaseModel):
+class AnalysisReport(BaseModel):
     # 0 = no detectable bias, 100 = severe, pervasive bias
     score: float
     summary: str
     flagged_phrases: list[FlaggedPhrase]
     next_steps: str
+
+
+class BiasReport(AnalysisReport):
+    tailoring_context: TailoringContext
