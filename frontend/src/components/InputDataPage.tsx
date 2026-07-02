@@ -17,7 +17,14 @@ interface InputDataPageProps {
 }
 
 // ---------- Questionnaire options ----------
-const AI_TOOLS = ['VMock', 'ChatGPT', 'Claude', 'Gemini', 'Copilot', 'Other']
+const AI_TOOLS = [
+  'VMock',
+  'ChatGPT',
+  'Claude',
+  'Gemini',
+  'Copilot',
+  'Other',
+]
 const COURSES = [
   'Art',
   'History',
