@@ -2,6 +2,8 @@
 # Uses structured outputs (messages.parse) so the response is guaranteed to
 # match the BiasReport schema / claude_output_template.json.
 
+import re
+
 from BiasAI.claude import client
 from BiasAI.models import AnalysisReport, BiasReport, TailoringContext
 from BiasRuleAlgo.strategy_base import BiasStrategyOutput
@@ -11,135 +13,242 @@ from BiasRuleAlgo.rba import run_strategies
 MODEL = "claude-haiku-4-5-20251001"
 
 
-DOMAIN_RUBRICS = {
-    "art": (
+DOMAIN_PROFILES = [
+    (
+        "art",
         "Arts and design rubric",
         "Look for language that narrows creative potential, dismisses portfolio evidence, or shifts from critique to character judgment.",
+        ("art", "arts", "design", "fine art", "graphic design", "visual arts"),
     ),
-    "history": (
+    (
+        "history",
         "Humanities rubric",
         "Look for vague professionalism language, stereotype-driven feedback, or advice that ignores evidence-based scholarly strengths.",
+        ("history", "historical studies", "art history"),
     ),
-    "liberal arts": (
+    (
+        "liberal arts",
         "Humanities rubric",
         "Look for vague professionalism language, stereotype-driven feedback, or advice that ignores evidence-based scholarly strengths.",
+        ("liberal arts", "liberal studies", "humanities", "arts and humanities"),
     ),
-    "computer science": (
+    (
+        "computer science",
         "STEM rubric",
         "Look for role-capping language that undercuts technical achievement, leadership, or research potential.",
+        (
+            "computer science",
+            "cs",
+            "comp sci",
+            "computing",
+            "software engineering",
+            "computer engineering",
+            "information technology",
+            "informatics",
+        ),
     ),
-    "engineering": (
+    (
+        "engineering",
         "STEM rubric",
         "Look for role-capping language that undercuts technical achievement, leadership, or research potential.",
+        (
+            "engineering",
+            "mechanical engineering",
+            "electrical engineering",
+            "civil engineering",
+            "chemical engineering",
+            "industrial engineering",
+        ),
     ),
-    "medicine": (
+    (
+        "medicine",
         "Healthcare rubric",
         "Look for language that overweights care stereotypes, emotional framing, or unsupported assumptions about pressure or suitability.",
+        ("medicine", "medical", "health", "healthcare", "health sciences", "nursing"),
     ),
-    "law": (
+    (
+        "law",
         "Professional studies rubric",
         "Look for language that overweights polish, tone, or social fit over evidence of analytical ability and achievement.",
+        ("law", "legal studies", "jurisprudence"),
     ),
-    "business": (
+    (
+        "business",
         "Business rubric",
         "Look for generic leadership framing, hierarchy bias, or advice that narrows ambition without evidence.",
+        (
+            "business",
+            "management",
+            "commerce",
+            "finance",
+            "accounting",
+            "marketing",
+            "mba",
+        ),
     ),
-    "psychology": (
+    (
+        "psychology",
         "Social science rubric",
         "Look for language that confuses empathy stereotypes with evidence of capability or leadership.",
+        ("psychology", "psycho"),
     ),
-    "sociology": (
+    (
+        "sociology",
         "Social science rubric",
         "Look for language that confuses empathy stereotypes with evidence of capability or leadership.",
+        ("sociology", "social work"),
     ),
-    "economics": (
+    (
+        "economics",
         "Quantitative social science rubric",
         "Look for language that underplays analytical rigor, quantitative skill, or research potential.",
+        ("economics", "econ", "econometrics"),
     ),
-    "political science": (
+    (
+        "political science",
         "Social science rubric",
         "Look for language that overweights confidence style or polish instead of reasoning and evidence.",
+        ("political science", "politics", "poli sci", "international relations"),
     ),
-    "philosophy": (
+    (
+        "philosophy",
         "Humanities rubric",
         "Look for vague professionalism language, stereotype-driven feedback, or advice that ignores evidence-based scholarly strengths.",
+        ("philosophy", "ethics", "logic"),
     ),
-    "mathematics": (
+    (
+        "mathematics",
         "STEM rubric",
         "Look for role-capping language that undercuts technical achievement, leadership, or research potential.",
+        ("mathematics", "math", "maths", "statistics", "applied mathematics"),
     ),
-    "physics": (
+    (
+        "physics",
         "STEM rubric",
         "Look for role-capping language that undercuts technical achievement, leadership, or research potential.",
+        ("physics", "physical sciences"),
     ),
-    "chemistry": (
+    (
+        "chemistry",
         "STEM rubric",
         "Look for role-capping language that undercuts technical achievement, leadership, or research potential.",
+        ("chemistry", "chemical sciences"),
     ),
-    "biology": (
+    (
+        "biology",
         "STEM rubric",
         "Look for role-capping language that undercuts technical achievement, leadership, or research potential.",
+        ("biology", "biological sciences", "life sciences"),
     ),
-    "education": (
+    (
+        "education",
         "Education rubric",
         "Look for language that typecasts applicants into support, nurturing, or junior roles without evidence.",
+        ("education", "teaching", "teacher education", "pedagogy"),
     ),
-}
+]
 
 
-TOOL_SIGNATURES = {
-    "vmock": (
+TOOL_PROFILES = [
+    (
+        "vmock",
+        "VMock",
         "Resume-scoring platform",
         "Check for formulaic, rank-driven feedback that overstates gaps or underweights context.",
+        ("vmock", "v mock", "v-mock"),
     ),
-    "chatgpt": (
+    (
+        "chatgpt",
+        "ChatGPT",
         "General-purpose LLM",
         "Check for generic praise, vague self-improvement language, or ungrounded role recommendations.",
+        ("chatgpt", "chat gpt", "openai", "gpt 4", "gpt4", "gpt 4o", "gpt-4", "gpt-4o"),
     ),
-    "claude": (
+    (
+        "claude",
+        "Claude",
         "General-purpose LLM",
         "Check for polished but generic feedback that may still encode subtle role-capping assumptions.",
+        ("claude", "anthropic"),
     ),
-    "gemini": (
+    (
+        "gemini",
+        "Gemini",
         "General-purpose LLM",
         "Check for broad recommendations that sound confident but are not tied to evidence in the CV.",
+        ("gemini", "bard", "google ai", "google gemini", "gemini pro"),
     ),
-    "copilot": (
+    (
+        "copilot",
+        "Copilot",
         "Productivity assistant",
         "Check for terse, automation-style advice that can blur critique with premature role narrowing.",
+        ("copilot", "microsoft copilot", "github copilot", "copilot chat"),
     ),
-}
+]
 
 
 def _normalize_key(value: str | None) -> str:
     return (value or "").strip().lower()
 
 
+def _compact_key(value: str | None) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", _normalize_key(value)).strip()
+
+
+def _resolve_domain_profile(value: str | None) -> tuple[str, str]:
+    normalized = _normalize_key(value)
+    compact = _compact_key(value)
+
+    for canonical_key, label, signal, aliases in DOMAIN_PROFILES:
+        if normalized == canonical_key or compact == canonical_key:
+            return label, signal
+
+    for canonical_key, label, signal, aliases in DOMAIN_PROFILES:
+        if any(alias in compact for alias in aliases):
+            return label, signal
+
+    return (
+        "General studies",
+        "Use a broad review for mixed or uncategorized study areas and avoid assuming specialized expectations.",
+    )
+
+
+def _resolve_tool_profile(value: str | None) -> tuple[str, str]:
+    normalized = _normalize_key(value)
+    compact = _compact_key(value)
+
+    for canonical_key, label, _group, signal, aliases in TOOL_PROFILES:
+        if normalized == canonical_key or compact == canonical_key:
+            return label, signal
+
+    for canonical_key, label, _group, signal, aliases in TOOL_PROFILES:
+        if any(alias in compact for alias in aliases):
+            return label, signal
+
+    return (
+        "Unknown or mixed tool",
+        "Use general bias heuristics and avoid claiming a vendor-specific failure pattern.",
+    )
+
+
 def build_tailoring_context(questionnaire: dict) -> TailoringContext:
     course = _normalize_key(questionnaire.get("course"))
     ai_tool = _normalize_key(questionnaire.get("ai_tool"))
 
-    domain, domain_rubric = DOMAIN_RUBRICS.get(
-        course,
-        (
-            "General studies rubric",
-            "Use a broad review for mixed or uncategorized study areas and avoid assuming specialized expectations.",
-        ),
-    )
-    tool_profile, _tool_signature = TOOL_SIGNATURES.get(
-        ai_tool,
-        (
-            "Unknown or mixed tool profile",
-            "Use general bias heuristics and avoid claiming a vendor-specific failure pattern.",
-        ),
-    )
+    domain, domain_rubric = _resolve_domain_profile(course)
+    tool_profile, tool_signal = _resolve_tool_profile(ai_tool)
 
     return TailoringContext(
         user_role=questionnaire.get("user") or "Unknown",
-        ai_tool=questionnaire.get("ai_tool") or "Unknown",
+        ai_tool=(
+            tool_profile
+            if tool_profile != "Unknown or mixed tool"
+            else questionnaire.get("ai_tool") or "Unknown"
+        ),
         domain=domain,
         domain_rubric=domain_rubric,
-        tool_profile=tool_profile,
+        tool_profile=f"{tool_profile}: {tool_signal}",
         gendered_language=questionnaire.get("gendered") or "Unsure",
         review_depth="standard",
     )
