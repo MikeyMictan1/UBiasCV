@@ -57,11 +57,6 @@ def _sentences(text: str) -> list[str]:
     return [part.strip() for part in SENTENCE_SPLIT_RE.split(text) if part.strip()]
 
 
-def _contains_any(text: str, terms: set[str]) -> list[str]:
-    lowered = text.lower()
-    return [term for term in terms if term in lowered]
-
-
 def _clamp(value: float, lower: float = 0.0, upper: float = 100.0) -> float:
     return max(lower, min(upper, value))
 
