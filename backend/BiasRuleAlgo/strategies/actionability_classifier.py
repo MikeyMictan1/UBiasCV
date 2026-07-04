@@ -148,7 +148,12 @@ def _sentences(text: str) -> list[str]:
 
 def _contains_any(text: str, terms: set[str]) -> list[str]:
     lowered = text.lower()
-    return [term for term in terms if term in lowered]
+    hits = []
+    for term in terms:
+        pattern = re.escape(term) if " " in term else r"\b" + re.escape(term) + r"\b"
+        if re.search(pattern, lowered):
+            hits.append(term)
+    return hits
 
 
 def _classify_sentence(sentence: str) -> tuple[str, list[str]]:
@@ -202,6 +207,7 @@ class ActionabilityClassifier(BiasStrategy):
     actionability category using ATS-style cues, then scores the share of
     sentences that give concrete, usable career guidance.
     """
+    signal_type = "quality"
 
     def analyse(self, cv_text: str, feedback_text: str) -> BiasStrategyOutput:
         """
@@ -213,7 +219,10 @@ class ActionabilityClassifier(BiasStrategy):
         sentences = _sentences(feedback_text)
         if not sentences:
             return BiasStrategyOutput(
-                strategy="ActionabilityClassifier", score=0, evidence=[]
+                strategy="ActionabilityClassifier",
+                score=0,
+                evidence=[],
+                signal_type=self.signal_type,
             )
 
         classified_sentences = []
@@ -237,5 +246,8 @@ class ActionabilityClassifier(BiasStrategy):
         )
 
         return BiasStrategyOutput(
-            strategy="ActionabilityClassifier", score=score, evidence=evidence
+            strategy="ActionabilityClassifier",
+            score=score,
+            evidence=evidence,
+            signal_type=self.signal_type,
         )

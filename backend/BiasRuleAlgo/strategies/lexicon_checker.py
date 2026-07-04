@@ -47,7 +47,8 @@ class LexiconChecker(BiasStrategy):
 
         for word, severity in all_words.items():
             pattern = r"\b" + re.escape(word) + r"\b"
-            if re.search(pattern, feedback_lower):
+            match = re.search(pattern, feedback_lower)
+            if match and not self._is_negated(feedback_lower, match.start()):
                 severities.append(severity)
                 evidence.append(self._snippet(feedback_text, word))
 
@@ -64,7 +65,13 @@ class LexiconChecker(BiasStrategy):
         end = min(len(text), idx + len(word) + window)
         return f"...{text[start:end]}..."
 
+    def _is_negated(self, text: str, idx: int, window: int = 24) -> bool:
+        preceding = text[max(0, idx - window):idx]
+        return bool(re.search(r"\b(not|isn't|wasn't|never|no longer)\b", preceding))
+
     def _compute_score(self, severities: list) -> int:
         if not severities:
             return 0
-        return round(sum(severities) / len(severities))
+        base = max(severities)
+        bonus = min(15, (len(severities) - 1) * 4)  # extra flagged terms only ever push the score up
+        return min(100, round(base + bonus))

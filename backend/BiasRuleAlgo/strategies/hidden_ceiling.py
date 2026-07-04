@@ -11,20 +11,21 @@ QUALIFICATION_TERMS = {
     "honors",
     "awards",
     "scholarship",
-    "internship",
-    "internships",
-    "research",
-    "publication",
-    "publications",
-    "leadership",
-    "captain",
-    "president",
-    "founder",
-    "projects",
-    "project outcomes",
     "academic excellence",
     "distinction",
+    "published research",
+    "patent",
 }
+
+STRONG_SIGNAL_PATTERNS = [
+    re.compile(r"\b\d+(?:\.\d+)?\s?%"),
+    re.compile(r"[\$£]\s?\d[\d,]*(?:\.\d+)?"),
+    re.compile(r"\b\d+\s?(?:million|thousand|k)\b", re.IGNORECASE),
+    re.compile(
+        r"\b(?:award|awarded|scholarship|patent|published|publication|publications|distinction)\b",
+        re.IGNORECASE,
+    ),
+]
 
 DOWNLEVEL_ROLE_TERMS = {
     "support role",
@@ -77,6 +78,11 @@ def _clamp(value: float, lower: float = 0.0, upper: float = 100.0) -> float:
     return max(lower, min(upper, value))
 
 
+def _has_strong_cv_signal(cv_text: str) -> bool:
+    return bool(_contains_any(cv_text, QUALIFICATION_TERMS)) or any(
+        pattern.search(cv_text) for pattern in STRONG_SIGNAL_PATTERNS
+    )
+
 class HiddenCeilingEngine(BiasStrategy):
     """
     HiddenCeilingEngine flags feedback that caps a strong candidate at lower-tier roles.
@@ -91,7 +97,7 @@ class HiddenCeilingEngine(BiasStrategy):
         feedback_downlevel_hits = _contains_any(feedback_text, DOWNLEVEL_ROLE_TERMS)
         feedback_upward_hits = _contains_any(feedback_text, UPWARD_ROLE_TERMS)
 
-        if not qualification_hits or not feedback_downlevel_hits:
+        if not _has_strong_cv_signal(cv_text) or not feedback_downlevel_hits:
             return BiasStrategyOutput(
                 strategy="HiddenCeilingEngine", score=0, evidence=[]
             )

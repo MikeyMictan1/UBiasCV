@@ -2,7 +2,7 @@ import re
 
 from ..strategy_base import BiasStrategy, BiasStrategyOutput
 
-ACHIEVEMENT_SIGNALS: list[str] = [
+ACHIEVEMENT_VERBS: list[str] = [
     "led",
     "managed",
     "headed",
@@ -41,60 +41,146 @@ ACHIEVEMENT_SIGNALS: list[str] = [
     "selected",
     "nominated",
     "certified",
-    r"\d+%",
-    r"\$\d+",
-    r"£\d+",
-    r"\d+ million",
-    r"\d+ thousand",
 ]
 
-_SIGNAL_PATTERNS = [
-    re.compile(r"\b" + s + r"\b", re.IGNORECASE) for s in ACHIEVEMENT_SIGNALS
+_VERB_PATTERNS = [re.compile(r"\b" + verb + r"\b", re.IGNORECASE) for verb in ACHIEVEMENT_VERBS]
+
+_NUMERIC_PATTERNS = [
+    re.compile(r"\d+(?:\.\d+)?\s?%"),
+    re.compile(r"[\$£]\s?\d[\d,]*(?:\.\d+)?"),
+    re.compile(r"\b\d+\s?(?:million|thousand|k)\b", re.IGNORECASE),
 ]
+
+SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+|\n+")
+
+STOPWORDS = {
+    "a",
+    "about",
+    "above",
+    "after",
+    "again",
+    "against",
+    "all",
+    "also",
+    "am",
+    "an",
+    "and",
+    "any",
+    "are",
+    "as",
+    "at",
+    "because",
+    "been",
+    "before",
+    "being",
+    "below",
+    "between",
+    "both",
+    "but",
+    "by",
+    "could",
+    "did",
+    "does",
+    "doing",
+    "down",
+    "during",
+    "each",
+    "few",
+    "for",
+    "from",
+    "further",
+    "had",
+    "has",
+    "have",
+    "having",
+    "here",
+    "how",
+    "into",
+    "its",
+    "itself",
+    "just",
+    "more",
+    "most",
+    "not",
+    "now",
+    "off",
+    "once",
+    "only",
+    "other",
+    "over",
+    "own",
+    "same",
+    "should",
+    "some",
+    "such",
+    "than",
+    "that",
+    "the",
+    "their",
+    "theirs",
+    "them",
+    "then",
+    "there",
+    "these",
+    "they",
+    "this",
+    "those",
+    "through",
+    "under",
+    "until",
+    "very",
+    "was",
+    "were",
+    "what",
+    "when",
+    "where",
+    "which",
+    "while",
+    "who",
+    "whom",
+    "why",
+    "will",
+    "with",
+    "within",
+    "would",
+    "your",
+    "yours",
+    "role",
+    "team",
+    "work",
+    "using",
+    "across",
+    "including",
+    "responsible",
+}
+
+COVERAGE_THRESHOLD = 0.34
 
 
 def _extract_sentences(text: str) -> list[str]:
-    return [s.strip() for s in re.split(r"[.!?]", text) if s.strip()]
+    return [s.strip() for s in SENTENCE_SPLIT_RE.split(text) if s.strip()]
 
 
 def _key_words(sentence: str) -> set[str]:
-    STOPWORDS = {
-        "with",
-        "that",
-        "this",
-        "have",
-        "from",
-        "they",
-        "been",
-        "were",
-        "their",
-        "which",
-        "will",
-        "also",
-        "more",
-        "into",
-        "than",
-        "then",
-        "when",
-        "your",
-        "team",
-        "role",
-        "work",
-        "within",
-    }
     words = re.findall(r"[a-zA-Z]{4,}", sentence.lower())
-    return {w for w in words if w not in STOPWORDS}
+    return {word for word in words if word not in STOPWORDS}
+
+
+def _feedback_wordset(feedback_text: str) -> set[str]:
+    return set(re.findall(r"[a-zA-Z]{4,}", feedback_text.lower()))
 
 
 def _is_achievement_sentence(sentence: str) -> bool:
-    return any(p.search(sentence) for p in _SIGNAL_PATTERNS)
+    return any(pattern.search(sentence) for pattern in _VERB_PATTERNS) or any(
+        pattern.search(sentence) for pattern in _NUMERIC_PATTERNS
+    )
 
 
-def _mentioned_in_feedback(
-    keywords: set[str], feedback_lower: str, threshold: int = 2
-) -> bool:
-    hits = sum(1 for kw in keywords if kw in feedback_lower)
-    return hits >= threshold
+def _coverage_ratio(keywords: set[str], feedback_words: set[str]) -> float:
+    if not keywords:
+        return 1.0
+    hits = sum(1 for keyword in keywords if keyword in feedback_words)
+    return hits / len(keywords)
 
 
 class OmissionPenalty(BiasStrategy):
@@ -105,25 +191,32 @@ class OmissionPenalty(BiasStrategy):
 
     def analyse(self, cv_text: str, feedback_text: str) -> BiasStrategyOutput:
         cv_sentences = _extract_sentences(cv_text)
-        feedback_lower = feedback_text.lower()
+        feedback_words = _feedback_wordset(feedback_text)
 
-        achievement_sentences = [s for s in cv_sentences if _is_achievement_sentence(s)]
+        candidates: list[tuple[str, bool]] = []
+        for sentence in cv_sentences:
+            has_verb = any(pattern.search(sentence) for pattern in _VERB_PATTERNS)
+            has_metric = any(pattern.search(sentence) for pattern in _NUMERIC_PATTERNS)
+            if has_verb or has_metric:
+                candidates.append((sentence, has_metric))
+
         omitted: list[str] = []
+        weighted_total = 0.0
+        weighted_omitted = 0.0
 
-        for sentence in achievement_sentences:
+        for sentence, has_metric in candidates:
+            weight = 2.0 if has_metric else 1.0
+            weighted_total += weight
             keywords = _key_words(sentence)
-            if not keywords:
-                continue
-            if not _mentioned_in_feedback(keywords, feedback_lower):
+            if keywords and _coverage_ratio(keywords, feedback_words) < COVERAGE_THRESHOLD:
                 omitted.append(sentence)
+                weighted_omitted += weight
 
-        total = len(achievement_sentences)
-        omission_count = len(omitted)
-
-        score = int((omission_count / total) * 100) if total > 0 else 0
+        score = int((weighted_omitted / weighted_total) * 100) if weighted_total > 0 else 0
 
         evidence = [
-            f'[OMISSION] Achievement not addressed in feedback: "{s}"' for s in omitted
+            f'[OMISSION] Achievement not addressed in feedback: "{sentence}"'
+            for sentence in omitted
         ]
 
         return BiasStrategyOutput(
