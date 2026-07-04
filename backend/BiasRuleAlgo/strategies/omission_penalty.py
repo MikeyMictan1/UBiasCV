@@ -173,13 +173,6 @@ def _key_words(sentence: str) -> set[str]:
 def _feedback_wordset(feedback_text: str) -> set[str]:
     return set(re.findall(r"[a-zA-Z]{4,}", feedback_text.lower()))
 
-
-def _is_achievement_sentence(sentence: str) -> bool:
-    return any(pattern.search(sentence) for pattern in _VERB_PATTERNS) or any(
-        pattern.search(sentence) for pattern in _NUMERIC_PATTERNS
-    )
-
-
 def _coverage_ratio(keywords: set[str], feedback_words: set[str]) -> float:
     if not keywords:
         return 1.0
