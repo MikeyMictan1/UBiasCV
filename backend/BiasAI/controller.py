@@ -4,7 +4,7 @@
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
-from BiasAI.extract import extract_text
+from BiasAI.extract import FileTooLargeError, extract_text
 from BiasAI.models import BiasReport
 from BiasAI.ubiasai import build_tailoring_context, generate_bias_report
 
@@ -25,8 +25,11 @@ async def analyze(
     course: str = Form(...),
     gendered: str = Form(...),
 ) -> BiasReport:
-    cv_text = extract_text(cv)
-    feedback_text = extract_text(ai_feedback)
+    try:
+        cv_text = extract_text(cv)
+        feedback_text = extract_text(ai_feedback)
+    except FileTooLargeError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
     # Error checking, if either file is empty or unreadable, return a 400 error.
     if not cv_text.strip() or not feedback_text.strip():
