@@ -146,7 +146,9 @@ function InputDataPage({ user, onReport }: InputDataPageProps) {
           ? detail.map((e) => `${e.loc?.slice(1).join('.')}: ${e.msg}`).join('; ')
           : typeof detail === 'string'
             ? detail
-            : `Request failed (${res.status})`
+            : res.status === 413
+              ? 'One of the files is too large. Please upload a smaller file.'
+              : `Request failed (${res.status})`
         throw new Error(message)
       }
       const report = await res.json()

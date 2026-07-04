@@ -7,7 +7,11 @@ import docx
 import pypdf
 from fastapi import UploadFile
 
-MAX_FILE_BYTES = 8 * 1024 * 1024  # 8 MB per uploaded file
+MAX_FILE_BYTES = 2 * 1024 * 1024  # 2 MB per uploaded file
+# Vercel's serverless functions hard-reject the whole request at 4.5MB (a
+# platform limit, enforced before this code runs — see FUNCTION_PAYLOAD_TOO_LARGE).
+# Two files at MAX_FILE_BYTES each stays safely under that with room for the
+# multipart overhead and form fields.
 MAX_TEXT_CHARS = 50_000  # ~12k tokens; well beyond any real CV or feedback doc
 
 

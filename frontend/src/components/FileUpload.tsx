@@ -7,6 +7,16 @@
 
 import { useRef, useState } from 'react'
 
+// Must match backend/BiasAI/extract.py MAX_FILE_BYTES. Vercel's serverless
+// functions hard-reject the whole request at 4.5MB before our code ever
+// runs, so we check client-side and fail fast instead of letting the user
+// wait through a slow upload that's doomed anyway.
+const MAX_FILE_BYTES = 2 * 1024 * 1024 // 2 MB
+
+function formatSize(bytes: number): string {
+  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`
+}
+
 interface FileUploadProps {
   // Reports the chosen file (or null) up to the parent
   onFileSelect: (file: File | null) => void
@@ -15,8 +25,16 @@ interface FileUploadProps {
 function FileUpload({ onFileSelect }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [fileName, setFileName] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   function selectFile(file: File | null) {
+    if (file && file.size > MAX_FILE_BYTES) {
+      setError(`${file.name} is ${formatSize(file.size)} — max size is ${formatSize(MAX_FILE_BYTES)}.`)
+      setFileName(null)
+      onFileSelect(null)
+      return
+    }
+    setError(null)
     setFileName(file?.name ?? null)
     onFileSelect(file)
   }
@@ -52,9 +70,11 @@ function FileUpload({ onFileSelect }: FileUploadProps) {
           {fileName ?? 'Drop or Browse'}
         </span>
         <span className="mt-2 text-sm tracking-wider text-bodygray">
-          PDF | DOCX | TXT
+          PDF | DOCX | TXT — max {formatSize(MAX_FILE_BYTES)}
         </span>
       </button>
+
+      {error && <p className="mt-2 text-sm font-medium text-coral">{error}</p>}
 
       {/* Hidden native file input */}
       <input

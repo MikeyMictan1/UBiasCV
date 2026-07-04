@@ -44,7 +44,7 @@ function ReviewPage({ report }: { report: BiasReport; user: string }) {
 
         <div className="border border-[#c49a1b]/40 bg-[#c49a1b]/10 p-6 sm:p-8">
           <h1 className="mb-3 text-2xl font-bold text-[#93650f] sm:text-3xl">
-            We couldn't analyze this as a CV and feedback
+            We couldn't analyse this as a CV and feedback
           </h1>
           <p className="text-base text-ink sm:text-lg">
             {report.input_notice ??

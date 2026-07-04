@@ -347,7 +347,7 @@ Be concise throughout. Keep "summary" to 2-3 sentences. List only the most \
 significant flagged phrases (at most 5), with a one-sentence reason for each — \
 do not flag minor or borderline cases. Keep "next_steps" to 2-3 short \
 sentences total, for the selected role only. Prefer plain, direct wording over \
-elaboration.
+elaboration. Write in British English.
 
 Be evidence-backed and specific:
 - For every item in "flagged_phrases", include an "evidence_snippet" copied
