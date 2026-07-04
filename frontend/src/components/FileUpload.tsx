@@ -32,6 +32,7 @@ function FileUpload({ onFileSelect }: FileUploadProps) {
       setError(`${file.name} is ${formatSize(file.size)} — max size is ${formatSize(MAX_FILE_BYTES)}.`)
       setFileName(null)
       onFileSelect(null)
+      if (inputRef.current) inputRef.current.value = ''
       return
     }
     setError(null)
