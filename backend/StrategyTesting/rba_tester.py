@@ -22,6 +22,18 @@ class _LocalUpload:
         self.filename = os.path.basename(filepath)
         self.file = open(filepath, "rb")
 
+    def close(self) -> None:
+        try:
+            self.file.close()
+        except Exception:
+            pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.close()
+        return False
 
 # The core strategy testing service
 def test_strategies(strategies):
