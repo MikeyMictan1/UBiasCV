@@ -23,6 +23,12 @@ class FlaggedPhrase(BaseModel):
 
 
 class AnalysisReport(BaseModel):
+    # False only when the CV/feedback text clearly isn't a CV and feedback on
+    # a CV at all (e.g. an unrelated document). When False, input_notice
+    # explains why and the fields below are safe defaults, not a bias verdict.
+    input_valid: bool
+    input_notice: str | None
+
     # 0 = no detectable bias, 100 = severe, pervasive bias
     score: float
     summary: str

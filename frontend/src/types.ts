@@ -19,6 +19,10 @@ export interface TailoringContext {
 }
 
 export interface BiasReport {
+  // False only when the uploaded CV/feedback clearly aren't a CV and
+  // feedback on a CV at all — see input_notice for why.
+  input_valid: boolean
+  input_notice: string | null
   score: number
   summary: string
   flagged_phrases: FlaggedPhrase[]

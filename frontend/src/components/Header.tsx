@@ -24,7 +24,7 @@ const STEPS: { num: string; label: string; page: PageName }[] = [
 function Header({ page, canReview, onNavigate }: HeaderProps) {
   return (
     <header className="border-b border-ink/40 bg-cream">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-10 py-4">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:px-6 sm:py-4 lg:px-10">
         {/* Logo → Introduction */}
         <button
           type="button"
@@ -32,11 +32,11 @@ function Header({ page, canReview, onNavigate }: HeaderProps) {
           className="shrink-0"
           aria-label="Back to introduction"
         >
-          <img src={logoHeader} alt="ubiascv" className="h-10 w-auto" />
+          <img src={logoHeader} alt="ubiascv" className="h-8 w-auto sm:h-10" />
         </button>
 
         {/* Stepper nav */}
-        <nav className="flex items-end gap-8">
+        <nav className="flex items-end gap-3 sm:gap-6 lg:gap-8">
           {STEPS.map((step) => {
             const isActive = page === step.page
             const isDisabled = step.page === 'review' && !canReview
@@ -50,14 +50,14 @@ function Header({ page, canReview, onNavigate }: HeaderProps) {
                 className="flex flex-col items-start disabled:cursor-not-allowed"
               >
                 <span
-                  className={`text-base ${
+                  className={`text-xs sm:text-base ${
                     isDisabled ? 'text-brand/40' : 'text-brand'
                   }`}
                 >
                   {step.num}
                 </span>
                 <span
-                  className={`border-b-2 pb-0.5 text-xl ${
+                  className={`border-b-2 pb-0.5 text-sm sm:text-lg lg:text-xl ${
                     isActive
                       ? 'border-brand text-brand'
                       : isDisabled

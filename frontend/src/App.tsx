@@ -12,9 +12,10 @@ import Footer from './components/Footer'
 import IntroPage from './components/IntroPage'
 import InputDataPage from './components/InputDataPage'
 import ReviewPage from './components/ReviewPage'
+import PrivacyPolicyPage from './components/PrivacyPolicyPage'
 import type { BiasReport } from './types'
 
-export type PageName = 'intro' | 'input' | 'review'
+export type PageName = 'intro' | 'input' | 'review' | 'privacy'
 
 function App() {
   const [page, setPage] = useState<PageName>('intro')
@@ -50,9 +51,11 @@ function App() {
         )}
 
         {page === 'review' && report && <ReviewPage report={report} user={user} />}
+
+        {page === 'privacy' && <PrivacyPolicyPage onBack={() => setPage('intro')} />}
       </main>
 
-      <Footer />
+      <Footer onNavigate={setPage} />
     </div>
   )
 }

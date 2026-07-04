@@ -159,11 +159,11 @@ function InputDataPage({ user, onReport }: InputDataPageProps) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-10 py-8">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
       <p className="mb-6 text-base text-brand">Input Data</p>
 
       {/* Uploads */}
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2">
         <Card num="01" title="The CV">
           <FileUpload onFileSelect={setCvFile} />
         </Card>
@@ -179,7 +179,7 @@ function InputDataPage({ user, onReport }: InputDataPageProps) {
             These details help tailor the analysis and the recommendations that
             follow.
           </p>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-3">
             <Field
               label="AI TOOL USED"
               options={AI_TOOLS}
@@ -209,7 +209,7 @@ function InputDataPage({ user, onReport }: InputDataPageProps) {
         type="button"
         onClick={handleGenerate}
         disabled={loading}
-        className="mt-8 flex items-center gap-3 bg-brand px-8 py-4 text-2xl font-bold text-white hover:bg-[#16466f] active:bg-[#103a5d] disabled:opacity-70"
+        className="mt-8 flex w-full items-center justify-center gap-3 bg-brand px-6 py-3 text-xl font-bold text-white hover:bg-[#16466f] active:bg-[#103a5d] disabled:opacity-70 sm:w-auto sm:justify-start sm:px-8 sm:py-4 sm:text-2xl"
       >
         {loading ? (
           <>

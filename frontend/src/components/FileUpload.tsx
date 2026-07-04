@@ -31,11 +31,11 @@ function FileUpload({ onFileSelect }: FileUploadProps) {
           e.preventDefault()
           selectFile(e.dataTransfer.files?.[0] ?? null)
         }}
-        className="flex w-full flex-col items-center justify-center border-2 border-dashed border-ink/30 px-4 py-12 text-center hover:border-brand"
+        className="flex w-full flex-col items-center justify-center border-2 border-dashed border-ink/30 px-4 py-8 text-center hover:border-brand sm:py-12"
       >
         {/* Download-tray icon */}
         <svg
-          className="h-12 w-12 text-ink"
+          className="h-10 w-10 text-ink sm:h-12 sm:w-12"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
@@ -48,7 +48,7 @@ function FileUpload({ onFileSelect }: FileUploadProps) {
           />
         </svg>
 
-        <span className="mt-3 max-w-full truncate px-2 text-2xl text-ink">
+        <span className="mt-3 max-w-full truncate px-2 text-xl text-ink sm:text-2xl">
           {fileName ?? 'Drop or Browse'}
         </span>
         <span className="mt-2 text-sm tracking-wider text-bodygray">
