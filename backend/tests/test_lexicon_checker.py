@@ -29,9 +29,7 @@ class LexiconCheckerTests(unittest.TestCase):
 
     def test_scores_multiple_bias_categories_without_diluting_the_severe_signal(self):
         strategy = LexiconChecker()
-        feedback = (
-            "The candidate is aggressive, brilliant, and attractive."
-        )
+        feedback = "The candidate is aggressive, brilliant, and attractive."
 
         result = strategy.analyse("", feedback)
 

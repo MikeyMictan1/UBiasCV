@@ -1,7 +1,6 @@
 import re
 from ..strategy_base import BiasStrategy, BiasStrategyOutput
 
-
 LEADERSHIP_TERMS = {
     "assertive": 80,
     "aggressive": 90,
@@ -80,7 +79,9 @@ class LexiconChecker(BiasStrategy):
         for category, words in TERM_CATEGORIES.items():
             for word, severity in words.items():
                 match = self._find_match(feedback_lower, word)
-                if match and not self._is_contextually_neutral(feedback_lower, match.start(), word):
+                if match and not self._is_contextually_neutral(
+                    feedback_lower, match.start(), word
+                ):
                     category_hits[category].append(severity)
                     evidence.append(self._snippet(feedback_text, word))
 
@@ -95,17 +96,25 @@ class LexiconChecker(BiasStrategy):
         pattern = r"\b" + re.escape(word) + r"\b"
         return re.search(pattern, text)
 
-    def _is_contextually_neutral(self, text: str, idx: int, word: str, window: int = 36) -> bool:
+    def _is_contextually_neutral(
+        self, text: str, idx: int, word: str, window: int = 36
+    ) -> bool:
         preceding = text[max(0, idx - window) : idx]
         following = text[idx : min(len(text), idx + len(word) + window)]
 
-        if re.search(rf'["\'“”‘’][^"\'“”‘’]{{0,40}}\b{re.escape(word)}\b[^"\'“”‘’]{{0,40}}["\'“”‘’]', text):
+        if re.search(
+            rf'["\'“”‘’][^"\'“”‘’]{{0,40}}\b{re.escape(word)}\b[^"\'“”‘’]{{0,40}}["\'“”‘’]',
+            text,
+        ):
             return True
 
         if any(term in preceding for term in META_TERMS):
             return True
 
-        if re.search(rf"\b(not|isn't|wasn't|never|no longer|hardly|barely|without)\b[^.?!\n]{{0,20}}\b{re.escape(word)}\b", preceding + following):
+        if re.search(
+            rf"\b(not|isn't|wasn't|never|no longer|hardly|barely|without)\b[^.?!\n]{{0,20}}\b{re.escape(word)}\b",
+            preceding + following,
+        ):
             return True
 
         return False
@@ -127,5 +136,7 @@ class LexiconChecker(BiasStrategy):
             return 0
         base = max(severities)
         category_bonus = min(12, (len(severities) - 1) * 3)
-        repeated_hit_bonus = min(8, sum(1 for severity in severities if severity >= 80) * 2)
+        repeated_hit_bonus = min(
+            8, sum(1 for severity in severities if severity >= 80) * 2
+        )
         return min(100, round(base + category_bonus + repeated_hit_bonus))

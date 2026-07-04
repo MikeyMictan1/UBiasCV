@@ -255,8 +255,7 @@ class ActionabilityClassifier(BiasStrategy):
             "Actionable categories: " + ", ".join(sorted(ACTIONABLE_CATEGORIES))
         )
         evidence.append(
-            "Bias-signaled categories: "
-            + ", ".join(sorted(BIAS_SIGNAL_CATEGORIES))
+            "Bias-signaled categories: " + ", ".join(sorted(BIAS_SIGNAL_CATEGORIES))
         )
 
         return BiasStrategyOutput(

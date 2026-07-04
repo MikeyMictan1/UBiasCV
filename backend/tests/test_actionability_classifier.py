@@ -32,7 +32,10 @@ class ActionabilityClassifierTests(unittest.TestCase):
             any("vague encouragement" in item.lower() for item in result.evidence)
         )
         self.assertTrue(
-            any("bias-signaled sentences: 2/4" in item.lower() for item in result.evidence)
+            any(
+                "bias-signaled sentences: 2/4" in item.lower()
+                for item in result.evidence
+            )
         )
 
     def test_ignores_purely_actionable_feedback(self):
@@ -49,15 +52,15 @@ class ActionabilityClassifierTests(unittest.TestCase):
             any("actionable sentences: 2/2" in item.lower() for item in result.evidence)
         )
         self.assertTrue(
-            any("bias-signaled sentences: 0/2" in item.lower() for item in result.evidence)
+            any(
+                "bias-signaled sentences: 0/2" in item.lower()
+                for item in result.evidence
+            )
         )
 
     def test_full_bias_language_scores_high(self):
         strategy = ActionabilityClassifier()
-        feedback = (
-            "You seem like a natural leader. "
-            "Stay positive and keep going."
-        )
+        feedback = "You seem like a natural leader. " "Stay positive and keep going."
 
         result = strategy.analyse("", feedback)
 
