@@ -1,4 +1,6 @@
 {
+    "input_valid": true,
+    "input_notice": null,
     "score": 0.0,
     "summary": "The AI output showed x things which are biased",
     "flagged_phrases": [

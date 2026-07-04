@@ -279,6 +279,30 @@ that detects when strong qualifications (grades, internships, leadership) in \
 the CV are paired with down-level role recommendations (support, junior, \
 administrative) in the feedback.
 
+Before doing any bias analysis, check whether the two documents plausibly ARE
+a CV and AI-generated feedback on that CV. Set "input_valid" to false ONLY
+when it's clearly and unambiguously not this — e.g. one or both documents are
+an unrelated document (a problem set, an essay, source code, a recipe,
+random/garbled text) with no reasonable reading as a CV or CV feedback.
+
+Bias toward "input_valid": true. A CV can be short, unconventional, in any
+format or industry, or even weak — none of that makes it invalid. Only reject
+when you are confident no reasonable person would call this a CV/feedback
+pair, since a false rejection here silently hides real bias analysis from
+someone who submitted a genuine CV, which is worse than letting an edge case
+through. If you are unsure, treat it as valid and proceed with the analysis.
+
+When "input_valid" is false: set "score" to 0, "flagged_phrases" to an empty
+list, and write "input_notice" as a one-sentence, plain-language explanation
+of what the uploaded documents actually look like instead (e.g. "The uploaded
+CV appears to be an algorithms problem set, not a CV."). Set "summary" to a
+short restatement of that same notice, and "next_steps" to a single sentence
+asking the user to re-upload an actual CV and the AI-generated feedback about
+that CV. Do not invent bias findings for irrelevant content.
+
+When "input_valid" is true, set "input_notice" to null and proceed exactly as
+described below.
+
 Analyse the AI feedback (not the CV itself) for bias — gender, racial, \
 socioeconomic, cultural, age, or other. Identify the specific phrases in the \
 AI feedback that are biased, vague, or could lead to unfair treatment, and \
@@ -323,7 +347,7 @@ Be concise throughout. Keep "summary" to 2-3 sentences. List only the most \
 significant flagged phrases (at most 5), with a one-sentence reason for each — \
 do not flag minor or borderline cases. Keep "next_steps" to 2-3 short \
 sentences total, for the selected role only. Prefer plain, direct wording over \
-elaboration.
+elaboration. Write in British English.
 
 Be evidence-backed and specific:
 - For every item in "flagged_phrases", include an "evidence_snippet" copied

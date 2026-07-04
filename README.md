@@ -35,6 +35,10 @@
 5) Run `python -m BiasAI.main` and everything should be working
 6) `uvicorn app:app --reload --port 8000` Starts the backend connection
 
+### RBA Strategy Testing
+1) Place CVs and feedback in the `backend/StrategyTesting/SampleCVFeedback` folder, with the naming convention: `testXgender.pdf` for CVs and `testXgender_feedback.txt` for feedback. Replace 'X' and 'gender' with the name of the test and gender.
+2) `cd backend` and run `python -m StrategyTesting.rba_tester` to run the strategy tester.
+
 To run the auto-formatter, just run `black .` and the files will be auto-formatted to best practices.
 
 ## Architecture

@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BiasRuleAlgo Fix Guide</title>
+<style>
+  :root {
+    --paper: #eef2f0;
+    --paper-raised: #ffffff;
+    --ink: #16211d;
+    --ink-dim: #4b5b55;
+    --line: #d4ddd8;
+    --accent: #2b6e63;
+    --accent-ink: #ffffff;
+    --accent-wash: #dcece7;
+    --good: #2f7a4f;
+    --good-wash: #e1f0e5;
+    --warn: #93650f;
+    --warn-wash: #f5e9d2;
+    --bad: #a83b3b;
+    --bad-wash: #f6dfdf;
+    --code-bg: #101a17;
+    --code-ink: #d9e8e2;
+    --code-add: #8fd4b0;
+    --code-add-bg: rgba(87, 179, 130, 0.14);
+    --code-del: #e59a9a;
+    --shadow: 0 1px 2px rgba(20, 30, 27, 0.06), 0 8px 24px rgba(20, 30, 27, 0.05);
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #101613;
+    --paper-raised: #161f1b;
+    --ink: #e7efeb;
+    --ink-dim: #9db3ab;
+    --line: #26332e;
+    --accent: #6fcdb8;
+    --accent-ink: #08201a;
+    --accent-wash: #17332c;
+    --good: #7fd4a0;
+    --good-wash: #17332590;
+    --warn: #e3b869;
+    --warn-wash: #33291490;
+    --bad: #e38c8c;
+    --bad-wash: #331c1c90;
+    --code-bg: #0a1210;
+    --code-ink: #d9e8e2;
+    --code-add: #7fd4a0;
+    --code-add-bg: rgba(127, 212, 160, 0.12);
+    --code-del: #e38c8c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #101613;
+      --paper-raised: #161f1b;
+      --ink: #e7efeb;
+      --ink-dim: #9db3ab;
+      --line: #26332e;
+      --accent: #6fcdb8;
+      --accent-ink: #08201a;
+      --accent-wash: #17332c;
+      --good: #7fd4a0;
+      --good-wash: #17332590;
+      --warn: #e3b869;
+      --warn-wash: #33291490;
+      --bad: #e38c8c;
+      --bad-wash: #331c1c90;
+      --code-bg: #0a1210;
+      --code-ink: #d9e8e2;
+      --code-add: #7fd4a0;
+      --code-add-bg: rgba(127, 212, 160, 0.12);
+      --code-del: #e38c8c;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .report {
+    font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 48px;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    font-weight: 600;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  .masthead {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 28px;
+    margin-bottom: 4px;
+  }
+
+  .eyebrow {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .masthead h1 {
+    font-size: 34px;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .masthead p.dek {
+    max-width: 62ch;
+    color: var(--ink-dim);
+    font-size: 16.5px;
+    margin: 0;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 20px;
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--ink-dim);
+    flex-wrap: wrap;
+  }
+  .meta-row strong { color: var(--ink); }
+
+  /* ---- sidebar / toc ---- */
+  .toc {
+    position: sticky;
+    top: 32px;
+    align-self: start;
+    font-size: 13.5px;
+  }
+  .toc-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 10px;
+  }
+  .toc ol {
+    list-style: none;
+    margin: 0 0 24px;
+    padding: 0;
+    border-left: 2px solid var(--line);
+  }
+  .toc li { margin: 0; }
+  .toc a {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 7px 0 7px 14px;
+    margin-left: -2px;
+    border-left: 2px solid transparent;
+    color: var(--ink-dim);
+    text-decoration: none;
+  }
+  .toc a:hover { color: var(--ink); border-left-color: var(--accent); }
+  .toc .arrow { color: var(--line); font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 12px; }
+
+  /* ---- main column ---- */
+  main { min-width: 0; }
+
+  section.intro { margin-bottom: 36px; }
+  section.intro p { max-width: 72ch; color: var(--ink-dim); }
+
+  /* ---- scorecard table ---- */
+  .scorecard-wrap { overflow-x: auto; margin: 20px 0 40px; border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); }
+  table.scorecard { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--paper-raised); }
+  table.scorecard th, table.scorecard td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  table.scorecard td.wrap { white-space: normal; }
+  table.scorecard th {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    font-weight: 700;
+  }
+  table.scorecard tr:last-child td { border-bottom: none; }
+  .score-move { display: flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+  .score-move .to { color: var(--good); font-weight: 700; }
+  .effort { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
+  .effort.low { background: var(--good-wash); color: var(--good); }
+  .effort.med { background: var(--warn-wash); color: var(--warn); }
+  .effort.high { background: var(--bad-wash); color: var(--bad); }
+
+  /* ---- strategy card ---- */
+  .strategy-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 30px 32px 32px;
+    margin-bottom: 40px;
+    scroll-margin-top: 24px;
+  }
+  .strategy-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  .strategy-head h2 { font-size: 23px; margin: 0; }
+  .strategy-head .file { font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace; font-size: 12.5px; color: var(--ink-dim); }
+
+  .chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 20px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .chip.bad { background: var(--bad-wash); color: var(--bad); }
+  .chip.warn { background: var(--warn-wash); color: var(--warn); }
+  .chip.good { background: var(--good-wash); color: var(--good); }
+  .move-chips { display: flex; align-items: center; gap: 8px; }
+  .move-chips .sep { color: var(--ink-dim); }
+
+  h3.sub {
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin: 26px 0 10px;
+  }
+  .strategy-card h3.sub:first-of-type { margin-top: 0; }
+
+  ul.problems { margin: 0; padding-left: 20px; }
+  ul.problems li { margin-bottom: 6px; color: var(--ink); }
+  ul.problems li::marker { color: var(--bad); }
+
+  .research-box {
+    background: var(--accent-wash);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-size: 14.5px;
+    margin: 8px 0 4px;
+  }
+  .research-box p { margin: 0 0 8px; }
+  .research-box p:last-child { margin-bottom: 0; }
+  .research-box .cite { font-size: 12.5px; color: var(--ink-dim); }
+  .research-box a { color: var(--accent); }
+
+  .code-block {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 10px 0 4px;
+  }
+  .code-block .tab {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+    font-size: 11.5px;
+    color: #9fb8ae;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    letter-spacing: 0.02em;
+  }
+  .code-block pre {
+    margin: 0;
+    padding: 14px 16px 16px;
+    overflow-x: auto;
+  }
+  .code-block code {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    white-space: pre;
+  }
+  .code-block .add { background: var(--code-add-bg); color: var(--code-add); display: inline-block; width: 100%; }
+  .code-block .del { color: var(--code-del); text-decoration: line-through; opacity: 0.75; display: inline-block; width: 100%; }
+
+  .delta-note { font-size: 13.5px; color: var(--ink-dim); margin: 8px 0 2px; }
+  .delta-note strong { color: var(--ink); }
+
+  ul.checks { list-style: none; margin: 6px 0 0; padding: 0; }
+  ul.checks li {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    font-size: 14.5px;
+    margin-bottom: 7px;
+  }
+  ul.checks li::before {
+    content: "✓";
+    color: var(--good);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .migration-note {
+    background: var(--warn-wash);
+    border-left: 3px solid var(--warn);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    margin: 12px 0 0;
+    color: var(--ink);
+  }
+  .migration-note strong { color: var(--warn); }
+
+  /* ---- cross cutting ---- */
+  .xc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 16px 0 8px; }
+  .xc-card { border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; background: var(--paper-raised); }
+  .xc-card h4 { font-size: 15px; margin: 0 0 6px; }
+  .xc-card p { font-size: 13.8px; color: var(--ink-dim); margin: 0; }
+
+  /* ---- rollout ---- */
+  ol.rollout { padding-left: 22px; }
+  ol.rollout li { margin-bottom: 10px; }
+  ol.rollout code { background: var(--accent-wash); padding: 1px 6px; border-radius: 4px; font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+
+  /* ---- refs ---- */
+  .refs { font-size: 13.5px; }
+  .refs ol { padding-left: 20px; }
+  .refs li { margin-bottom: 8px; color: var(--ink-dim); }
+  .refs a { color: var(--accent); word-break: break-word; }
+
+  code.inline { background: var(--accent-wash); padding: 1px 6px; border-radius: 4px; font-family: ui-monospace, Consolas, monospace; font-size: 0.92em; }
+
+  @media (max-width: 880px) {
+    .report { grid-template-columns: 1fr; }
+    .toc { position: static; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+    .toc ol { display: flex; flex-wrap: wrap; gap: 4px 14px; border-left: none; }
+    .toc a { padding: 4px 0; border-left: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="report">
+  <header class="masthead">
+    <div class="eyebrow">BiasRuleAlgo — Strategy Audit &amp; Fix Guide</div>
+    <h1>Getting all five strategies to 7/10</h1>
+    <p class="dek">A concrete, code-level plan for OmissionPenalty, LexiconChecker, HiddenCeilingEngine, CareerGapPenalty, and ActionabilityClassifier — grounded in published research on gendered performance-review language, keyword-extraction methods, and risk-score aggregation.</p>
+    <div class="meta-row">
+      <span><strong>Scope:</strong> backend/BiasRuleAlgo/strategies/</span>
+      <span><strong>New dependencies required:</strong> none (stdlib only)</span>
+      <span><strong>Date:</strong> 2026-07-03</span>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <div class="toc-label">Contents</div>
+    <ol>
+      <li><a href="#scorecard">Scorecard <span class="arrow"></span></a></li>
+      <li><a href="#omission">OmissionPenalty <span class="arrow">3→7</span></a></li>
+      <li><a href="#lexicon">LexiconChecker <span class="arrow">6→8</span></a></li>
+      <li><a href="#ceiling">HiddenCeilingEngine <span class="arrow">7→8</span></a></li>
+      <li><a href="#gap">CareerGapPenalty <span class="arrow">6.5→8</span></a></li>
+      <li><a href="#action">ActionabilityClassifier <span class="arrow">5→7</span></a></li>
+      <li><a href="#crosscutting">Cross-cutting fixes <span class="arrow"></span></a></li>
+      <li><a href="#rollout">Rollout order <span class="arrow"></span></a></li>
+      <li><a href="#refs">References <span class="arrow"></span></a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <section class="intro" id="scorecard">
+      <p>Each fix below is scoped to be dependency-free — everything uses Python's standard library (<code class="inline">re</code>, <code class="inline">difflib</code>). Where a heavier ML upgrade would raise the ceiling further, it's flagged as an optional stretch rather than baked into the 7/10 target.</p>
+
+      <div class="scorecard-wrap">
+        <table class="scorecard">
+          <thead>
+            <tr><th>Strategy</th><th>Score</th><th>Effort</th><th class="wrap">Primary fix</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="#omission">OmissionPenalty</a></td>
+              <td><span class="score-move"><span class="chip bad">3</span>→<span class="chip good to">8</span></span></td>
+              <td><span class="effort high">High</span></td>
+              <td class="wrap">Fix broken numeric regex, ratio-based coverage instead of fixed threshold, symmetric token matching, real stopword list</td>
+            </tr>
+            <tr>
+              <td><a href="#lexicon">LexiconChecker</a></td>
+              <td><span class="score-move"><span class="chip warn">6</span>→<span class="chip good to">8</span></span></td>
+              <td><span class="effort low">Low</span></td>
+              <td class="wrap">Replace mean-based severity with max + diminishing bonus; add negation guard</td>
+            </tr>
+            <tr>
+              <td><a href="#ceiling">HiddenCeilingEngine</a></td>
+              <td><span class="score-move"><span class="chip warn">7</span>→<span class="chip good to">8</span></span></td>
+              <td><span class="effort low">Low</span></td>
+              <td class="wrap">Tighten the CV-side qualification gate so it isn't nearly-always-open</td>
+            </tr>
+            <tr>
+              <td><a href="#gap">CareerGapPenalty</a></td>
+              <td><span class="score-move"><span class="chip warn">6.5</span>→<span class="chip good to">8</span></span></td>
+              <td><span class="effort med">Medium</span></td>
+              <td class="wrap">Detect real gaps from CV date ranges; split conflated OR gate into two tiers</td>
+            </tr>
+            <tr>
+              <td><a href="#action">ActionabilityClassifier</a></td>
+              <td><span class="score-move"><span class="chip warn">5</span>→<span class="chip good to">7</span></span></td>
+              <td><span class="effort low">Low</span></td>
+              <td class="wrap">Mark it as a quality metric (not bias-risk) via a <code class="inline">polarity</code> field; fix substring overmatch</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= OMISSION ================= -->
+    <section class="strategy-card" id="omission">
+      <div class="strategy-head">
+        <h2>OmissionPenalty</h2>
+        <span class="file">strategies/omission_penalty.py</span>
+      </div>
+      <div class="move-chips" style="margin-bottom:18px;">
+        <span class="chip bad">3 / 10</span><span class="sep">→</span><span class="chip good">8 / 10</span>
+      </div>
+
+      <h3 class="sub">What's wrong</h3>
+      <ul class="problems">
+        <li>Achievement-sentence gate matches almost every CV bullet (<code class="inline">built</code>, <code class="inline">created</code>, <code class="inline">managed</code>…), so it isn't selective.</li>
+        <li>Fixed <code class="inline">threshold=2</code> coverage check is inverted: short achievements need <em>both</em> keywords present, long ones only need 2 of 20 — the more detailed the achievement, the easier it is to mark "covered."</li>
+        <li>Stopword list is 20 ad hoc words with no principled basis, missing common noise (<code class="inline">said</code>, <code class="inline">each</code>, <code class="inline">many</code>…).</li>
+        <li>Asymmetric matching: CV keywords are extracted with word boundaries, but feedback checking is bare substring — <code class="inline">lead</code> "matches" <em>leadership</em>, <em>misleading</em>.</li>
+        <li>Sentence splitting only breaks on <code class="inline">.!?</code>, so newline-separated CV bullets collapse into one sentence.</li>
+        <li>The numeric patterns (<code class="inline">\d+%</code>, <code class="inline">\$\d+</code>) are wrapped in <code class="inline">\b...\b</code> and mostly never fire — the strongest achievement signals are silently dead.</li>
+      </ul>
+
+      <h3 class="sub">Research grounding</h3>
+      <div class="research-box">
+        <p>The <code class="inline">\b\d+%\b</code> pattern fails because <code class="inline">%</code> is a non-word character — there's already a word boundary between the digit and <code class="inline">%</code>, so requiring a second one after it over-constrains the match. The fix is to drop the trailing boundary on patterns that end in punctuation-class characters.</p>
+        <p class="cite">Confirmed against: <a href="https://www.regular-expressions.info/wordboundaries.html" target="_blank" rel="noopener">regular-expressions.info, "Word Boundaries"</a>; <a href="https://developmentality.wordpress.com/2011/09/22/python-gotcha-word-boundaries-in-regular-expressions/" target="_blank" rel="noopener">"Python Gotcha: Word boundaries in regular expressions"</a></p>
+      </div>
+      <div class="research-box">
+        <p>Fixed-count keyword thresholds don't scale with sentence length; a coverage <em>ratio</em> is the standard approach in keyword-extraction literature for comparing whether one text's salient terms reappear in another. RAKE-style extraction and TF-IDF both operate on proportional term weight, not raw counts, for exactly this reason.</p>
+        <p class="cite">Source: <a href="https://nzmattgrant.wordpress.com/2018/01/31/a-comparison-of-rake-and-tf-idf-algorithms-for-finding-keywords-in-text/" target="_blank" rel="noopener">"A comparison of RAKE and TF-IDF algorithms for finding keywords in text"</a></p>
+      </div>
+
+      <h3 class="sub">The fix</h3>
+      <div class="delta-note">Split the achievement signal into <strong>verbs</strong> (weak signal) and <strong>metrics</strong> (strong signal, weighted 2×) — a dropped "increased revenue 40%" should count for more than a dropped "built a dashboard."</div>
+      <div class="code-block">
+        <div class="tab">omission_penalty.py</div>
+        <pre><code>ACHIEVEMENT_VERBS: list[str] = [
+    "led", "managed", "headed", "oversaw", "directed", "supervised",
+    "coordinated", "spearheaded", "founded", "co-founded", "increased",
+    "decreased", "reduced", "improved", "grew", "boosted", "saved",
+    "generated", "delivered", "achieved", "exceeded", "launched", "built",
+    "developed", "designed", "created", "implemented", "deployed",
+    "awarded", "won", "recognised", "recognized", "promoted", "published",
+    "presented", "selected", "nominated", "certified",
+]
+_VERB_PATTERNS = [re.compile(r"\b" + v + r"\b", re.IGNORECASE) for v in ACHIEVEMENT_VERBS]
+
+<span class="add">_NUMERIC_PATTERNS = [
+    re.compile(r"\d+(\.\d+)?\s?%"),                       # no trailing \b — fixes the dead-pattern bug
+    re.compile(r"[\$£]\s?\d[\d,]*(\.\d+)?"),
+    re.compile(r"\b\d+\s?(million|thousand|k)\b", re.IGNORECASE),
+]</span>
+
+<span class="add"># sibling strategies already split on newlines — align with that convention
+SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+|\n+")</span>
+
+def _extract_sentences(text: str) -> list[str]:
+    return [s.strip() for s in SENTENCE_SPLIT_RE.split(text) if s.strip()]</code></pre>
+      </div>
+
+      <div class="delta-note">Replace the 20-word ad hoc stopword list with a standard ~130-word set (NLTK's English list, vendored so no new dependency is needed), and make matching <strong>symmetric</strong> — both sides tokenized the same way instead of CV-side word-boundary vs. feedback-side substring.</div>
+      <div class="code-block">
+        <div class="tab">omission_penalty.py</div>
+        <pre><code><span class="add"># Vendored from NLTK's stopwords corpus (public, no install needed) — see references.
+STOPWORDS = {
+    "a", "about", "above", "after", "again", "against", "all", "also", "am", "an",
+    "and", "any", "are", "as", "at", "because", "been", "before", "being", "below",
+    "between", "both", "but", "by", "could", "did", "does", "doing", "down",
+    "during", "each", "few", "for", "from", "further", "had", "has", "have",
+    "having", "here", "how", "into", "its", "itself", "just", "more", "most",
+    "not", "now", "off", "once", "only", "other", "over", "own", "same", "should",
+    "some", "such", "than", "that", "the", "their", "theirs", "them", "then",
+    "there", "these", "they", "this", "those", "through", "under", "until", "very",
+    "was", "were", "what", "when", "where", "which", "while", "who", "whom",
+    "why", "will", "with", "within", "would", "your", "yours", "role", "team",
+    "work", "using", "across", "including", "responsible",
+}</span>
+
+def _key_words(sentence: str) -> set[str]:
+    words = re.findall(r"[a-zA-Z]{4,}", sentence.lower())
+    return {w for w in words if w not in STOPWORDS}
+
+<span class="add"># feedback tokenized identically to CV keywords — no more asymmetric substring matching
+def _feedback_wordset(feedback_text: str) -> set[str]:
+    return set(re.findall(r"[a-zA-Z]{4,}", feedback_text.lower()))</span></code></pre>
+      </div>
+
+      <div class="delta-note">Swap the fixed count for a <strong>coverage ratio</strong>, and weight metric-bearing sentences 2× when rolling up the final score.</div>
+      <div class="code-block">
+        <div class="tab">omission_penalty.py</div>
+        <pre><code><span class="add">COVERAGE_THRESHOLD = 0.34  # ~1 in 3 distinctive terms must surface in the feedback
+
+def _coverage_ratio(keywords: set[str], feedback_words: set[str]) -> float:
+    if not keywords:
+        return 1.0
+    hits = sum(1 for kw in keywords if kw in feedback_words)
+    return hits / len(keywords)</span>
+
+class OmissionPenalty(BiasStrategy):
+    def analyse(self, cv_text: str, feedback_text: str) -> BiasStrategyOutput:
+        cv_sentences = _extract_sentences(cv_text)
+        feedback_words = _feedback_wordset(feedback_text)
+
+        candidates = []  # (sentence, is_metric)
+        for s in cv_sentences:
+            has_verb = any(p.search(s) for p in _VERB_PATTERNS)
+            has_metric = any(p.search(s) for p in _NUMERIC_PATTERNS)
+            if has_verb or has_metric:
+                candidates.append((s, has_metric))
+
+        omitted, weighted_total, weighted_omitted = [], 0.0, 0.0
+        for sentence, is_metric in candidates:
+            weight = 2.0 if is_metric else 1.0
+            weighted_total += weight
+            keywords = _key_words(sentence)
+            if keywords and _coverage_ratio(keywords, feedback_words) < COVERAGE_THRESHOLD:
+                omitted.append(sentence)
+                weighted_omitted += weight
+
+        score = int((weighted_omitted / weighted_total) * 100) if weighted_total > 0 else 0
+        evidence = [f'[OMISSION] Achievement not addressed in feedback: "{s}"' for s in omitted]
+        return BiasStrategyOutput(strategy="OmissionPenalty", score=score, evidence=evidence)</code></pre>
+      </div>
+
+      <div class="delta-note"><strong>Optional stretch (still zero new dependencies):</strong> catch paraphrased achievements the keyword check misses, using stdlib <code class="inline">difflib</code> as a fuzzy fallback before marking something omitted.</div>
+      <div class="code-block">
+        <div class="tab">omission_penalty.py — optional</div>
+        <pre><code><span class="add">from difflib import SequenceMatcher
+
+def _best_similarity(sentence: str, feedback_sentences: list[str]) -> float:
+    return max(
+        (SequenceMatcher(None, sentence.lower(), fb.lower()).ratio() for fb in feedback_sentences),
+        default=0.0,
+    )
+# In the loop: if coverage fails, check _best_similarity(sentence, feedback_sentences) > 0.5
+# before marking as omitted. Character-based, not semantic — a cheap safety net, not a
+# replacement for the ratio check.</span></code></pre>
+      </div>
+      <div class="research-box">
+        <p><strong>Further ceiling (real dependency investment):</strong> sentence-transformer embeddings + cosine similarity give genuine paraphrase detection rather than character or token overlap. Research on MRPC-style paraphrase benchmarks found optimized cosine thresholds cluster around <strong>0.6–0.7</strong> depending on model, with 0.671 the empirically best cut for MPNet.</p>
+        <p class="cite">Sources: <a href="https://sbert.net/docs/sentence_transformer/usage/semantic_textual_similarity.html" target="_blank" rel="noopener">Sentence-Transformers, "Semantic Textual Similarity"</a>; <a href="https://www.mdpi.com/2073-431X/14/9/385" target="_blank" rel="noopener">"Transformer Models for Paraphrase Detection: A Comprehensive Semantic Similarity Study," MDPI 2026</a></p>
+      </div>
+
+      <h3 class="sub">Why this reaches 8/10</h3>
+      <ul class="checks">
+        <li>Dead regex patterns now fire — the strongest achievement signals (money, %) actually count.</li>
+        <li>Coverage scales proportionally instead of rewarding longer, more detailed achievements with an easier bar.</li>
+        <li>Symmetric tokenized matching removes the substring false-positive problem in both directions.</li>
+        <li>Metric-weighted scoring means a dropped quantified win outweighs a dropped generic bullet, matching how a human reviewer would judge severity.</li>
+      </ul>
+    </section>
+
+    <!-- ================= LEXICON ================= -->
+    <section class="strategy-card" id="lexicon">
+      <div class="strategy-head">
+        <h2>LexiconChecker</h2>
+        <span class="file">strategies/lexicon_checker.py</span>
+      </div>
+      <div class="move-chips" style="margin-bottom:18px;">
+        <span class="chip warn">6 / 10</span><span class="sep">→</span><span class="chip good">8 / 10</span>
+      </div>
+
+      <h3 class="sub">What's wrong</h3>
+      <ul class="problems">
+        <li>Score is the <em>average</em> of matched severities — adding a second, milder flagged word (e.g. <code class="inline">collaborative</code>, severity 50) next to <code class="inline">aggressive</code> (90) drags the score from 90 down to 70. More biased language should never lower the score.</li>
+        <li>No negation or subject check — <code class="inline">"not at all aggressive"</code> scores identically to <code class="inline">"very aggressive"</code>.</li>
+      </ul>
+
+      <h3 class="sub">Research grounding — the word lists themselves are sound</h3>
+      <div class="research-box">
+        <p>Good news first: the flagged terms aren't arbitrary. Kieran Snyder's 2014 study of tech-industry performance reviews found words like <em>abrasive</em>, <em>aggressive</em>, and <em>bossy</em> disproportionately describing women, where the same behavior in men reads as <em>assertive</em> or "taking charge." Stanford's Correll et al. (2020) found women's reviews lean on <em>diligence</em> language (<em>hardworking</em>, <em>organized</em>) while men's lean on ability language (<em>brilliant</em>, <em>genius</em>) — precisely the split already encoded in <code class="inline">FLAGGED_WORDS_ACHIEVEMENT</code>. Keep the lists; fix the aggregation.</p>
+        <p class="cite">Sources: <a href="https://www.gsb.stanford.edu/insights/language-gender-bias-performance-reviews" target="_blank" rel="noopener">Stanford GSB, "The Language of Gender Bias in Performance Reviews"</a>; <a href="https://journals.sagepub.com/doi/10.1177/0003122420962080" target="_blank" rel="noopener">Correll, Weisshaar, Wynn &amp; Wehner, "Inside the Black Box of Organizational Life," 2020</a>; <a href="https://www.betterup.com/blog/performance-reviews-and-gender-bias" target="_blank" rel="noopener">BetterUp, summarizing Snyder's 2014 findings</a></p>
+      </div>
+      <div class="research-box">
+        <p>On aggregation: risk-scoring literature treats mean-pooling and max-pooling as a known trade-off — averaging dampens rare-but-severe signals, while pure max ignores that repeated violations matter too. A log-sum-exp-style blend (max plus a diminishing bonus for additional hits) is the standard middle ground.</p>
+        <p class="cite">Source: <a href="https://arxiv.org/pdf/2601.21235" target="_blank" rel="noopener">"SHARP: Social Harm Analysis via Risk Profiles," arXiv 2601.21235</a> — discusses LSE aggregation as interpolating between mean and max pooling.</p>
+      </div>
+
+      <h3 class="sub">The fix</h3>
+      <div class="code-block">
+        <div class="tab">lexicon_checker.py</div>
+        <pre><code>def analyse(self, cv_text: str, feedback_text: str) -> BiasStrategyOutput:
+    feedback_lower = feedback_text.lower()
+    evidence, severities = [], []
+    all_words = {**self.FLAGGED_WORDS_LEADERSHIP, **self.FLAGGED_WORDS_ACHIEVEMENT, **self.FLAGGED_WORDS_APPEARANCE}
+
+    for word, severity in all_words.items():
+        pattern = r"\b" + re.escape(word) + r"\b"
+        match = re.search(pattern, feedback_lower)
+<span class="add">        if match and not self._is_negated(feedback_lower, match.start()):</span>
+            severities.append(severity)
+            evidence.append(self._snippet(feedback_text, word))
+
+    score = self._compute_score(severities)
+    return BiasStrategyOutput(strategy="LexiconChecker", score=score, evidence=evidence)
+
+<span class="add">def _is_negated(self, text: str, idx: int, window: int = 24) -> bool:
+    preceding = text[max(0, idx - window):idx]
+    return bool(re.search(r"\b(not|isn't|wasn't|never|no longer)\b", preceding))</span>
+
+def _compute_score(self, severities: list) -> int:
+    if not severities:
+        return 0
+<span class="del">    return round(sum(severities) / len(severities))</span>
+<span class="add">    base = max(severities)
+    bonus = min(15, (len(severities) - 1) * 4)  # extra flagged terms only ever push the score up
+    return min(100, round(base + bonus))</span></code></pre>
+      </div>
+
+      <h3 class="sub">Why this reaches 8/10</h3>
+      <ul class="checks">
+        <li>More flagged language can never lower the score — a single severe term still dominates, and extra hits add a capped bonus instead of diluting it.</li>
+        <li>Negated mentions ("not at all aggressive") no longer count as a hit.</li>
+        <li>The underlying word lists are now explicitly backed by published performance-review-bias research, not just intuition.</li>
+      </ul>
+    </section>
+
+    <!-- ================= HIDDEN CEILING ================= -->
+    <section class="strategy-card" id="ceiling">
+      <div class="strategy-head">
+        <h2>HiddenCeilingEngine</h2>
+        <span class="file">strategies/hidden_ceiling.py</span>
+      </div>
+      <div class="move-chips" style="margin-bottom:18px;">
+        <span class="chip warn">7 / 10</span><span class="sep">→</span><span class="chip good">8 / 10</span>
+      </div>
+
+      <h3 class="sub">What's wrong</h3>
+      <ul class="problems">
+        <li>Already the best-designed strategy: real directional hypothesis, early-zero guard, clamping, and it credits mitigating "upward" language.</li>
+        <li>The one weak point: <code class="inline">QUALIFICATION_TERMS</code> includes generic nouns (<code class="inline">"projects"</code>, <code class="inline">"research"</code>, <code class="inline">"leadership"</code>) that appear in nearly every CV — the CV-side gate is nearly always open, so almost all of the discriminating power lives on the feedback side alone.</li>
+      </ul>
+
+      <h3 class="sub">The fix</h3>
+      <div class="delta-note">Drop the generic terms and OR the remaining distinctive terms against the same metric/award pattern used in OmissionPenalty (pulled from the new shared module — see <a href="#crosscutting">Cross-cutting fixes</a>), so the gate requires an actually strong signal, not just common CV vocabulary.</div>
+      <div class="code-block">
+        <div class="tab">hidden_ceiling.py</div>
+        <pre><code>from ._shared import STRONG_SIGNAL_PATTERNS, contains_any, sentences, clamp
+
+QUALIFICATION_TERMS = {
+    "high grades", "top grades", "excellent grades", "strong grades",
+    "honours", "honors", "awards", "scholarship",
+<span class="del">    "internship", "internships", "research", "publication", "publications",
+    "leadership", "captain", "president", "founder", "projects",
+    "project outcomes", "academic excellence", "distinction",</span>
+<span class="add">    "academic excellence", "distinction", "published research", "patent",</span>
+}
+<span class="add"># generic terms like "projects" / "research" / "leadership" removed — they appear in
+# nearly every CV and gave the gate no discriminating power.
+
+def _has_strong_cv_signal(cv_text: str) -> bool:
+    return bool(contains_any(cv_text, QUALIFICATION_TERMS)) or any(
+        p.search(cv_text) for p in STRONG_SIGNAL_PATTERNS
+    )</span></code></pre>
+      </div>
+      <div class="delta-note">Then swap the gate check at the top of <code class="inline">analyse()</code> from <code class="inline">qualification_hits</code> to <code class="inline">_has_strong_cv_signal(cv_text)</code>. The rest of the scoring logic (the additive <code class="inline">base_score</code> build-up) is sound as-is.</div>
+
+      <h3 class="sub">Why this reaches 8/10</h3>
+      <ul class="checks">
+        <li>The CV-side gate now requires an actually distinguishing signal (award, distinction, quantified metric) instead of vocabulary most CVs contain.</li>
+        <li>Shares its "strong signal" detector with OmissionPenalty, so the two strategies can't silently disagree about what counts as an achievement.</li>
+      </ul>
+    </section>
+
+    <!-- ================= CAREER GAP ================= -->
+    <section class="strategy-card" id="gap">
+      <div class="strategy-head">
+        <h2>CareerGapPenalty</h2>
+        <span class="file">strategies/career_gap.py</span>
+      </div>
+      <div class="move-chips" style="margin-bottom:18px;">
+        <span class="chip warn">6.5 / 10</span><span class="sep">→</span><span class="chip good">8 / 10</span>
+      </div>
+
+      <h3 class="sub">What's wrong</h3>
+      <ul class="problems">
+        <li>Never inspects <code class="inline">cv_text</code> — it can't tell whether the candidate actually has a career gap, only whether the feedback <em>uses gap-related words</em>.</li>
+        <li>The guard is <code class="inline">gap_hits OR negative_hits</code> (line 89): generic negative-timeline language ("weak trajectory") scores on its own, with zero connection to an actual gap — that can just be legitimate critical feedback.</li>
+        <li>Verbatim multi-word term matching (<code class="inline">"maternity leave"</code>, exact phrase) gives low recall — real biased language is rarely that on-the-nose.</li>
+      </ul>
+
+      <h3 class="sub">The fix</h3>
+      <div class="delta-note">Detect actual employment gaps from the CV's own date ranges — a real structural signal instead of trusting the feedback's word choice.</div>
+      <div class="code-block">
+        <div class="tab">career_gap.py</div>
+        <pre><code><span class="add">DATE_RANGE_RE = re.compile(
+    r"(19\d{2}|20\d{2})\s*(?:-|–|—|to)\s*(19\d{2}|20\d{2}|present|current)",
+    re.IGNORECASE,
+)
+
+def _has_cv_gap(cv_text: str, min_gap_years: float = 0.75, current_year: int = 2026) -> bool:
+    spans = []
+    for match in DATE_RANGE_RE.finditer(cv_text):
+        start = int(match.group(1))
+        end_raw = match.group(2).lower()
+        end = current_year if end_raw in ("present", "current") else int(end_raw)
+        spans.append((start, end))
+    spans.sort()
+    return any(b_start - a_end >= min_gap_years for (_, a_end), (b_start, _) in zip(spans, spans[1:]))</span></code></pre>
+      </div>
+      <div class="delta-note">Split the single OR gate into two tiers: explicit gap-language in the feedback scores as before (unchanged — this preserves the existing passing test), but negative-timeline language <em>without</em> explicit gap wording now only escalates when a real CV gap is independently confirmed.</div>
+      <div class="code-block">
+        <div class="tab">career_gap.py</div>
+        <pre><code>def analyse(self, cv_text: str, feedback_text: str) -> BiasStrategyOutput:
+    sentences_ = sentences(feedback_text)
+    gap_hits = contains_any(feedback_text, GAP_TERMS)
+    negative_hits = contains_any(feedback_text, NEGATIVE_TIMELINE_TERMS)
+<span class="add">    cv_gap_confirmed = _has_cv_gap(cv_text)</span>
+
+<span class="del">    if not gap_hits and not negative_hits:</span>
+<span class="add">    if not gap_hits and not (negative_hits and cv_gap_confirmed):</span>
+        return BiasStrategyOutput(strategy="CareerGapPenalty", score=0, evidence=[])
+
+<span class="add">    # lower base when the signal comes only from inferred + confirmed gap, not explicit wording
+    base_score = 25.0 if gap_hits else 15.0</span>
+    base_score += min(30.0, len(gap_hits) * 8.0)
+    base_score += min(25.0, len(negative_hits) * 10.0)
+    base_score += 10.0 if gap_hits and negative_hits else 0.0
+    ...</code></pre>
+      </div>
+
+      <div class="migration-note"><strong>Test migration note:</strong> <code class="inline">tests/test_career_gap.py</code> currently calls <code class="inline">strategy.analyse("", feedback)</code> with an empty CV. That test still passes unchanged because it asserts on feedback containing "maternity leave" verbatim (<code class="inline">gap_hits</code> is non-empty regardless of CV content). Add a new test asserting the <em>negative-only</em> path stays at zero when <code class="inline">cv_text=""</code> — that's the behavior this fix is meant to change.</div>
+
+      <h3 class="sub">Why this reaches 8/10</h3>
+      <ul class="checks">
+        <li>Generic critical language no longer gets treated as gap-bias unless there's an actual gap in the CV to be biased about.</li>
+        <li>Existing passing test is preserved; new coverage targets exactly the behavior that changed.</li>
+        <li>The discount-factor mechanism (already a nice touch) is untouched.</li>
+      </ul>
+    </section>
+
+    <!-- ================= ACTIONABILITY ================= -->
+    <section class="strategy-card" id="action">
+      <div class="strategy-head">
+        <h2>ActionabilityClassifier</h2>
+        <span class="file">strategies/actionability_classifier.py</span>
+      </div>
+      <div class="move-chips" style="margin-bottom:18px;">
+        <span class="chip warn">5 / 10</span><span class="sep">→</span><span class="chip good">7 / 10</span>
+      </div>
+
+      <h3 class="sub">What's wrong</h3>
+      <ul class="problems">
+        <li>Its score means the opposite of every other strategy's: here, <em>high = good</em>. Averaged into a future aggregate score alongside the other four, it will silently cancel out real bias signal.</li>
+        <li>It isn't a bias detector at all — no comparison against the CV, no demographic or contextual signal, purely a feedback-quality metric.</li>
+        <li>Short/ambiguous terms match as bare substrings: <code class="inline">"star"</code> (line 89) fires on <em>start</em>/<em>restart</em>; generic terms like <code class="inline">"role"</code>/<code class="inline">"job"</code> count as "actionable" too liberally.</li>
+      </ul>
+
+      <h3 class="sub">The fix</h3>
+      <div class="delta-note">Give <code class="inline">BiasStrategyOutput</code> a <code class="inline">polarity</code> field so any future aggregator knows this one runs backwards — cheap now, prevents a real bug later (see <a href="#crosscutting">Cross-cutting fixes</a> for the base-class change).</div>
+      <div class="code-block">
+        <div class="tab">actionability_classifier.py</div>
+        <pre><code>class ActionabilityClassifier(BiasStrategy):
+<span class="add">    polarity = "quality"  # higher = better feedback; NOT a bias-risk score — exclude from
+                          # bias aggregation or invert before combining with the other four</span>
+    """
+    ActionabilityClassifier classifies each feedback sentence into a strict
+    actionability category ...
+    """</code></pre>
+      </div>
+      <div class="delta-note">Fix substring overmatch by requiring word boundaries for single-word terms (multi-word phrases like <code class="inline">"case study"</code> are already safe as substrings).</div>
+      <div class="code-block">
+        <div class="tab">actionability_classifier.py</div>
+        <pre><code>def _contains_any(text: str, terms: set[str]) -> list[str]:
+    lowered = text.lower()
+<span class="del">    return [term for term in terms if term in lowered]</span>
+<span class="add">    hits = []
+    for term in terms:
+        pattern = re.escape(term) if " " in term else r"\b" + re.escape(term) + r"\b"
+        if re.search(pattern, lowered):
+            hits.append(term)
+    return hits</span></code></pre>
+      </div>
+      <div class="delta-note"><strong>Optional, makes it bias-relevant rather than adjacent:</strong> surface it as a cross-check — when a sentence classifies as <code class="inline">"Personality critique"</code> <em>and</em> LexiconChecker independently flagged that same sentence, that co-occurrence is itself a stronger bias signal than either alone.</div>
+
+      <h3 class="sub">Why this reaches 7/10</h3>
+      <ul class="checks">
+        <li>Score semantics are now explicit and machine-readable, so it can't silently corrupt a future aggregate.</li>
+        <li>Word-boundary matching removes the <em>star</em>/<em>start</em> class of false positives.</li>
+        <li>Still capped below the others because, honestly, it's a good feedback-quality tool wearing a bias-strategy interface — full marks would mean actually tying it back to bias (the cross-check idea above), which is a larger change than a fix pass.</li>
+      </ul>
+    </section>
+
+    <!-- ================= CROSS-CUTTING ================= -->
+    <section class="strategy-card" id="crosscutting">
+      <div class="strategy-head">
+        <h2>Cross-cutting fixes</h2>
+        <span class="file">strategies/_shared.py (new)</span>
+      </div>
+      <p style="color:var(--ink-dim); margin-top:0;">Four small changes that benefit all five strategies at once and cost less than fixing them independently per-file.</p>
+
+      <div class="xc-grid">
+        <div class="xc-card">
+          <h4>1. Score polarity convention</h4>
+          <p>Add <code class="inline">polarity: str = "bias_risk"</code> to <code class="inline">BiasStrategyOutput</code>. Four strategies default to it; ActionabilityClassifier overrides to <code class="inline">"quality"</code>. Stops the first aggregation pass from averaging incompatible directions.</p>
+        </div>
+        <div class="xc-card">
+          <h4>2. Extract shared helpers</h4>
+          <p><code class="inline">_contains_any</code>, <code class="inline">_sentences</code>, and <code class="inline">_clamp</code> are already byte-identical across <code class="inline">career_gap.py</code> and <code class="inline">hidden_ceiling.py</code>. Move them to <code class="inline">strategies/_shared.py</code> alongside the new <code class="inline">STRONG_SIGNAL_PATTERNS</code> so the strategies can't quietly diverge.</p>
+        </div>
+        <div class="xc-card">
+          <h4>3. Consistent matching</h4>
+          <p>Standardize on word-boundary regex for single-word terms everywhere; reserve bare substring matching for genuine multi-word phrases only.</p>
+        </div>
+        <div class="xc-card">
+          <h4>4. Test coverage parity</h4>
+          <p><code class="inline">omission_penalty.py</code> and <code class="inline">lexicon_checker.py</code> have no test files today, unlike the other three. Add <code class="inline">test_omission_penalty.py</code> and <code class="inline">test_lexicon_checker.py</code> covering: a paraphrased achievement (should not omit), a negated flagged word (should not fire), and a multi-severity feedback sample (score must not drop below the single highest severity).</p>
+        </div>
+      </div>
+
+      <div class="code-block" style="margin-top:18px;">
+        <div class="tab">strategy_base.py</div>
+        <pre><code>@dataclass
+class BiasStrategyOutput:
+    strategy: str
+    score: int
+    evidence: List[str]
+<span class="add">    polarity: str = "bias_risk"  # "bias_risk" (higher = more biased) or "quality" (higher = better)</span></code></pre>
+      </div>
+    </section>
+
+    <!-- ================= ROLLOUT ================= -->
+    <section class="strategy-card" id="rollout">
+      <div class="strategy-head"><h2>Suggested rollout order</h2></div>
+      <ol class="rollout">
+        <li>Add <code>polarity</code> to <code>BiasStrategyOutput</code> and create <code>strategies/_shared.py</code> first — every other change depends on importing from it.</li>
+        <li>LexiconChecker and ActionabilityClassifier next — smallest diffs, no cross-strategy dependency, immediate correctness win (the mean-aggregation bug is actively wrong today).</li>
+        <li>HiddenCeilingEngine — swap the qualification gate to use the shared <code>STRONG_SIGNAL_PATTERNS</code>.</li>
+        <li>OmissionPenalty — the biggest rewrite; also defines <code>STRONG_SIGNAL_PATTERNS</code> if not already added in step 1.</li>
+        <li>CareerGapPenalty last — depends on nothing above, but its test file needs a companion update, so give it its own review pass.</li>
+      </ol>
+    </section>
+
+    <!-- ================= REFERENCES ================= -->
+    <section class="strategy-card refs" id="refs">
+      <div class="strategy-head"><h2>References</h2></div>
+      <ol>
+        <li><a href="https://www.gsb.stanford.edu/insights/language-gender-bias-performance-reviews" target="_blank" rel="noopener">Stanford Graduate School of Business — "The Language of Gender Bias in Performance Reviews"</a></li>
+        <li><a href="https://journals.sagepub.com/doi/10.1177/0003122420962080" target="_blank" rel="noopener">Correll, Weisshaar, Wynn &amp; Wehner (2020) — "Inside the Black Box of Organizational Life: The Gendered Language of Performance Assessment," American Sociological Review</a></li>
+        <li><a href="https://www.betterup.com/blog/performance-reviews-and-gender-bias" target="_blank" rel="noopener">BetterUp — "Performance Reviews Can Reinforce Gender Bias" (summarizing Kieran Snyder's 2014 study)</a></li>
+        <li><a href="https://sbert.net/docs/sentence_transformer/usage/semantic_textual_similarity.html" target="_blank" rel="noopener">Sentence-Transformers documentation — "Semantic Textual Similarity"</a></li>
+        <li><a href="https://sbert.net/examples/applications/paraphrase-mining/README.html" target="_blank" rel="noopener">Sentence-Transformers documentation — "Paraphrase Mining"</a></li>
+        <li><a href="https://www.mdpi.com/2073-431X/14/9/385" target="_blank" rel="noopener">"Transformer Models for Paraphrase Detection: A Comprehensive Semantic Similarity Study," MDPI, 2026</a></li>
+        <li><a href="https://nzmattgrant.wordpress.com/2018/01/31/a-comparison-of-rake-and-tf-idf-algorithms-for-finding-keywords-in-text/" target="_blank" rel="noopener">"A comparison of RAKE and TF-IDF algorithms for finding keywords in text"</a></li>
+        <li><a href="https://www.regular-expressions.info/wordboundaries.html" target="_blank" rel="noopener">regular-expressions.info — "Word Boundaries"</a></li>
+        <li><a href="https://developmentality.wordpress.com/2011/09/22/python-gotcha-word-boundaries-in-regular-expressions/" target="_blank" rel="noopener">"Python Gotcha: Word boundaries in regular expressions"</a></li>
+        <li><a href="https://arxiv.org/pdf/2601.21235" target="_blank" rel="noopener">"SHARP: Social Harm Analysis via Risk Profiles for Measuring Inequities in Large Language Models," arXiv:2601.21235</a></li>
+        <li><a href="https://gist.github.com/sebleier/554280" target="_blank" rel="noopener">NLTK's English stopwords list (reference gist)</a></li>
+      </ol>
+    </section>
+  </main>
+</div>
+
+</body>
+</html>
