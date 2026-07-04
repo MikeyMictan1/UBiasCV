@@ -109,10 +109,11 @@ class HiddenCeilingEngine(BiasStrategy):
         strong_pattern_matches = any(
             pattern.search(cv_text) for pattern in STRONG_SIGNAL_PATTERNS
         )
+        has_strong_cv_signal = strong_pattern_matches or bool(qualification_hits)
         if strong_pattern_matches and not qualification_hits:
             qualification_hits.append("strong signal (numeric/award)")
 
-        if not _has_strong_cv_signal(cv_text) or not feedback_downlevel_hits:
+        if not has_strong_cv_signal or not feedback_downlevel_hits:
             return BiasStrategyOutput(
                 strategy="HiddenCeilingEngine", score=0, evidence=[]
             )
