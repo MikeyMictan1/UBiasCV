@@ -35,6 +35,7 @@ class _LocalUpload:
         self.close()
         return False
 
+
 # The core strategy testing service
 def test_strategies(strategies):
     # Formatting + Setup
