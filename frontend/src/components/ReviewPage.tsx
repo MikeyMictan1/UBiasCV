@@ -7,7 +7,7 @@
 
 import type { BiasReport } from '../types'
 
-// Score → colour band: >60 red, 30–60 dark yellow, <30 green.
+// Score → colour band: >60 red, 40–60 dark yellow, 20–40 yellow, <20 green.
 function scoreColor(score: number): string {
   if (score > 60) return '#ff5d60'
   if (score > 40) return '#c49a1b'
