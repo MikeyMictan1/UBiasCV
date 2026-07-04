@@ -1,0 +1,90 @@
+Hi Crystal, thanks for sharing your CV! You have an incredibly strong technical background, especially considering you are currently pursuing your BSc at the University of Warwick.
+
+To answer your main question upfront: **Yes, technical roles are absolutely right for you.** Your CV showcases a phenomenal mix of deep technical competence, practical project delivery, and strong leadership.
+
+Here is a comprehensive breakdown and feedback on your CV, along with potential career paths to explore.
+
+---
+
+## Skill Evaluation
+
+Based on the evidence provided in your CV, here is an evaluation of your core professional skills:
+
+| Skill Category | Score (out of 10) | Evidence / Justification |
+| --- | --- | --- |
+| **Technical & Programming Skills** | **9.5/10** | Proficient in an impressive array of languages (C++, Java, Python, Haskell, TypeScript) and domains, spanning AI (ResNet18) , game development (Godot, Unreal, Pygame) , and full-stack web dev.
+
+ |
+| **Leadership & Ownership** | **9.0/10** | Founded your own indie game studio , led a winning hackathon team of four , and managed international teams to hit tight deadlines.
+
+ |
+| **Problem Solving & Algorithms** | **9.0/10** | Proven experience implementing advanced algorithms, including custom enemy AI , pathfinding ($A^*$ algorithm, depth-first search) , and rule-based spatial logic.
+
+ |
+| **Communication & Presentation** | **8.5/10** | Successfully pitched to Capital One corporate representatives , wrote an extensive 50-page technical documentation manual , and generated huge public engagement via video editing.
+
+ |
+| **Suitability for Technical Roles** | **9.5/10** | **Outstanding.** You transition effortlessly between abstract software engineering, low-level concepts, data science, and practical deployment. |
+
+---
+
+## Career Paths to Keep Open
+
+Given your highly versatile skill set, you shouldn't limit yourself to just standard software engineering. Consider these lucrative and rewarding paths:
+
+### 1. Quantitative Finance / Fintech Developer
+
+* 
+**Why:** You already noted that your Poker AI Engine applies to fintech contexts like algorithmic trading or portfolio optimization. Finance firms deeply value functional programming (Haskell) , high-performance languages (C++) , and advanced math/probabilistic logic.
+
+
+* **Roles:** Quantitative Developer, Algorithmic Trading Engineer, Fintech Software Engineer.
+
+### 2. AI / Machine Learning Engineer
+
+* 
+**Why:** You have an NVIDIA Jetson AI Certification , hands-on experience training neural networks (ResNet18) , and data manipulation skills (Pandas, NumPy).
+
+
+* **Roles:** ML Engineer, Computer Vision Engineer, Data Scientist.
+
+### 3. Game Developer / Graphics Engineer
+
+* **Why:** You are a proven self-starter in this industry. You have built a custom engine pipeline, deployed a commercial game on Steam with over 200 players , and worked on an academic game study for the University of Zurich.
+
+
+* **Roles:** Gameplay Programmer, Graphics/Engine Programmer, Systems Engineer.
+
+### 4. Technical Product Manager / Engineering Lead
+
+* 
+**Why:** As a woman in tech with elite technical skills *and* proven leadership/communication capabilities (Hackathon winner , Studio Founder , Capital One Pitch ), you have the perfect blend to lead teams and bridge the gap between business, design, and code.
+
+
+
+---
+
+## CV Feedback & Recommendations
+
+### The Strengths:
+
+* 
+**Metrics-Driven:** Excellent use of quantifiable metrics (e.g., "96% accuracy" , "increased user understanding by 85%" , "600+ people playing" ).
+
+
+* 
+**Prestige:** Achieving a First in your first year at Warwick alongside your stellar A-Level results ($A^*A^*AA$)  immediately positions you as a top-tier candidate.
+
+
+
+### Areas for Improvement:
+
+* 
+**Formatting Check:** Look at the date for the University of Zurich role (`Sep. 2009 Jul. 2024`). This appears to be a typo, suggesting a 15-year career starting when you were a child, especially since your Highgate schooling shows a different timeline and you have an internship there in 2025. Fix this line to accurately reflect the timeline.
+
+
+* **Tailoring:** Because you are good at *so many things*, your CV might look a bit scattered to a recruiter. If you apply for a quantitative finance role, put the Poker AI project at the very top. If you apply for a mainstream tech company, emphasize your autonomous car simulator or web development.
+
+
+
+You have an exceptional trajectory ahead of you, Crystal. Keep pushing boundaries in both your technical projects and your leadership initiatives!
