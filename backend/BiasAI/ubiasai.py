@@ -342,10 +342,8 @@ def _format_strategy_results(strategy_results: list[BiasStrategyOutput]) -> str:
     lines = []
     for result in strategy_results:
         evidence = "; ".join(result.evidence) if result.evidence else "none"
-        signal_type = getattr(result, "signal_type", "bias_risk")
-        suffix = f" [{signal_type}]" if signal_type != "bias_risk" else ""
         lines.append(
-            f"- {result.strategy}{suffix}: score={result.score:.0f}; evidence={evidence}"
+            f"- {result.strategy}: score={result.score:.0f}; evidence={evidence}"
         )
     return "\n".join(lines)
 

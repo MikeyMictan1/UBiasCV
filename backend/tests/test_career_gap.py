@@ -33,6 +33,16 @@ class CareerGapPenaltyTests(unittest.TestCase):
         self.assertEqual(result.score, 0)
         self.assertEqual(result.evidence, [])
 
+    def test_does_not_flag_negative_language_without_a_real_gap(self):
+        strategy = CareerGapPenalty()
+
+        result = strategy.analyse(
+            "", "The timeline shows slower progression, but the review stays objective."
+        )
+
+        self.assertEqual(result.score, 0)
+        self.assertEqual(result.evidence, [])
+
 
 if __name__ == "__main__":
     unittest.main()

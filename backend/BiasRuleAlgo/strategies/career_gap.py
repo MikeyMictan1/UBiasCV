@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 from ..strategy_base import BiasStrategy, BiasStrategyOutput
 
@@ -64,12 +65,30 @@ def _contains_any(text: str, terms: set[str]) -> list[str]:
 def _clamp(value: float, lower: float = 0.0, upper: float = 100.0) -> float:
     return max(lower, min(upper, value))
 
+
 DATE_RANGE_RE = re.compile(
     r"(19\d{2}|20\d{2})\s*(?:-|–|—|to)\s*(19\d{2}|20\d{2}|present|current)",
     re.IGNORECASE,
 )
 
-def _has_cv_gap(cv_text: str, min_gap_years: float = 0.75, current_year: int = 2026) -> bool:
+
+def _term_pattern(term: str) -> re.Pattern[str]:
+    return (
+        re.compile(re.escape(term), re.IGNORECASE)
+        if " " in term
+        else re.compile(r"\b" + re.escape(term) + r"\b", re.IGNORECASE)
+    )
+
+
+def _contains_any(text: str, terms: set[str]) -> list[str]:
+    lowered = text.lower()
+    return [term for term in terms if _term_pattern(term).search(lowered)]
+
+
+def _has_cv_gap(
+    cv_text: str, min_gap_years: float = 0.75, current_year: int | None = None
+) -> bool:
+    current_year = current_year or datetime.now().year
     spans = []
     for match in DATE_RANGE_RE.finditer(cv_text):
         start = int(match.group(1))
@@ -77,7 +96,10 @@ def _has_cv_gap(cv_text: str, min_gap_years: float = 0.75, current_year: int = 2
         end = current_year if end_raw in ("present", "current") else int(end_raw)
         spans.append((start, end))
     spans.sort()
-    return any(b_start - a_end >= min_gap_years for (_, a_end), (b_start, _) in zip(spans, spans[1:]))
+    return any(
+        b_start - a_end >= min_gap_years
+        for (_, a_end), (b_start, _) in zip(spans, spans[1:])
+    )
 
 
 class CareerGapPenalty(BiasStrategy):

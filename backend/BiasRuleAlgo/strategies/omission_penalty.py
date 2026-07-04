@@ -1,4 +1,5 @@
 import re
+from difflib import SequenceMatcher
 
 from ..strategy_base import BiasStrategy, BiasStrategyOutput
 
@@ -43,7 +44,9 @@ ACHIEVEMENT_VERBS: list[str] = [
     "certified",
 ]
 
-_VERB_PATTERNS = [re.compile(r"\b" + verb + r"\b", re.IGNORECASE) for verb in ACHIEVEMENT_VERBS]
+_VERB_PATTERNS = [
+    re.compile(r"\b" + verb + r"\b", re.IGNORECASE) for verb in ACHIEVEMENT_VERBS
+]
 
 _NUMERIC_PATTERNS = [
     re.compile(r"\d+(?:\.\d+)?\s?%"),
@@ -155,6 +158,7 @@ STOPWORDS = {
 }
 
 COVERAGE_THRESHOLD = 0.34
+PARAPHRASE_THRESHOLD = 0.58
 
 
 def _extract_sentences(text: str) -> list[str]:
@@ -183,6 +187,16 @@ def _coverage_ratio(keywords: set[str], feedback_words: set[str]) -> float:
     return hits / len(keywords)
 
 
+def _best_similarity(sentence: str, feedback_sentences: list[str]) -> float:
+    return max(
+        (
+            SequenceMatcher(None, sentence.lower(), feedback_sentence.lower()).ratio()
+            for feedback_sentence in feedback_sentences
+        ),
+        default=0.0,
+    )
+
+
 class OmissionPenalty(BiasStrategy):
     """
     OmissionPenalty detects when AI-generated CV feedback ignores
@@ -191,6 +205,7 @@ class OmissionPenalty(BiasStrategy):
 
     def analyse(self, cv_text: str, feedback_text: str) -> BiasStrategyOutput:
         cv_sentences = _extract_sentences(cv_text)
+        feedback_sentences = _extract_sentences(feedback_text)
         feedback_words = _feedback_wordset(feedback_text)
 
         candidates: list[tuple[str, bool]] = []
@@ -208,11 +223,19 @@ class OmissionPenalty(BiasStrategy):
             weight = 2.0 if has_metric else 1.0
             weighted_total += weight
             keywords = _key_words(sentence)
-            if keywords and _coverage_ratio(keywords, feedback_words) < COVERAGE_THRESHOLD:
+            coverage = _coverage_ratio(keywords, feedback_words)
+            similarity = _best_similarity(sentence, feedback_sentences)
+            if (
+                keywords
+                and coverage < COVERAGE_THRESHOLD
+                and similarity < PARAPHRASE_THRESHOLD
+            ):
                 omitted.append(sentence)
                 weighted_omitted += weight
 
-        score = int((weighted_omitted / weighted_total) * 100) if weighted_total > 0 else 0
+        score = (
+            int((weighted_omitted / weighted_total) * 100) if weighted_total > 0 else 0
+        )
 
         evidence = [
             f'[OMISSION] Achievement not addressed in feedback: "{sentence}"'

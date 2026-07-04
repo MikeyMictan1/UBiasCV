@@ -67,7 +67,12 @@ SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+|\n+")
 
 def _contains_any(text: str, terms: set[str]) -> list[str]:
     lowered = text.lower()
-    return [term for term in terms if term in lowered]
+    hits = []
+    for term in terms:
+        pattern = re.escape(term) if " " in term else r"\b" + re.escape(term) + r"\b"
+        if re.search(pattern, lowered):
+            hits.append(term)
+    return hits
 
 
 def _sentences(text: str) -> list[str]:
@@ -82,6 +87,7 @@ def _has_strong_cv_signal(cv_text: str) -> bool:
     return bool(_contains_any(cv_text, QUALIFICATION_TERMS)) or any(
         pattern.search(cv_text) for pattern in STRONG_SIGNAL_PATTERNS
     )
+
 
 class HiddenCeilingEngine(BiasStrategy):
     """

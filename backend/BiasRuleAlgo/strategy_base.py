@@ -12,7 +12,6 @@ class BiasStrategyOutput:
     strategy: str
     score: int
     evidence: List[str]
-    signal_type: str = "bias_risk"
 
 
 class BiasStrategy(abc.ABC):
