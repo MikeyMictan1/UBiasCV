@@ -44,7 +44,7 @@ function IntroPage({ onSelectUser }: IntroPageProps) {
           Detecting Gender Bias in AI CV Feedback Tools
         </h1>
         <p className="max-w-4xl text-base text-ink sm:text-lg">
-          ubiascv compares a CV against AI-generated feedback, and detects gender
+          UBiasCV compares a CV against AI-generated feedback, and detects gender
           bias introduced by the AI with a score, flagged phrases, and next steps.
         </p>
       </div>
