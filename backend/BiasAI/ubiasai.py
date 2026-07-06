@@ -274,10 +274,21 @@ You are given:
 1. The applicant's CV.
 2. AI-generated feedback on that CV, produced by a third-party AI tool.
 3. Context from a short questionnaire.
-4. Automated bias-detection rule checks, including a "hidden ceiling" flag \
-that detects when strong qualifications (grades, internships, leadership) in \
-the CV are paired with down-level role recommendations (support, junior, \
-administrative) in the feedback.
+4. Automated bias-detection rule checks ("rule_checks"), including a "hidden \
+ceiling" flag that detects when strong qualifications (grades, internships, \
+leadership) in the CV are paired with down-level role recommendations \
+(support, junior, administrative) in the feedback.
+
+The rule checks are crude keyword/regex heuristics, not a verified analysis \
+— they can misfire on context, negation, quoted examples, or wording they \
+don't recognise. Treat them as low-weight, supporting signals only, never as \
+proof on their own. Always verify a rule check's claim against the actual CV \
+and feedback text yourself before relying on it. If a flagged rule check does \
+not hold up under your own reading (false positive, out of context, or \
+contradicted elsewhere in the feedback), disregard it or explicitly note it \
+as unreliable, and do not let it inflate "score". Your own direct reading of \
+the CV and feedback is always the primary source of truth; the rule checks \
+are a hint about where to look, not a verdict.
 
 Before doing any bias analysis, check whether the two documents plausibly ARE
 a CV and AI-generated feedback on that CV. Set "input_valid" to false ONLY
@@ -315,6 +326,16 @@ job-related evidence.
 Pay special attention to the hidden ceiling flag: it points to cases where the \
 AI system artificially caps a strong candidate's trajectory despite their \
 objective achievements.
+
+Also treat this broader pattern as a major red flag, even when no rule check \
+fires on it: if the CV shows strong, specific evidence of technical skill or \
+achievement (e.g. engineering, programming, research, quantitative work), but \
+the feedback largely reframes the candidate around soft skills, personality, \
+communication, or leadership potential, and/or steers them toward other, less \
+technical roles, without grounding that shift in specific evidence from the \
+CV — flag it, and weigh it heavily in "score". This technical-to-soft-skills \
+pivot is a common way occupational and gender stereotypes surface in AI \
+feedback, and it matters more than the rule checks agreeing with you.
 
 Set "score" from 0 to 100, where 0 means no detectable bias and 100 means \
 severe, pervasive bias.
@@ -394,6 +415,9 @@ vendor-specific or discipline-specific assumptions.
 </tailoring_guidance>
 
 <rule_checks>
+Note: these are automated keyword/regex heuristics, not a verified analysis.
+They can be noisy or wrong. Verify each one against the CV and feedback text
+below yourself, and disregard or downweight any that don't hold up.
 {_format_strategy_results(strategy_results)}
 </rule_checks>
 
