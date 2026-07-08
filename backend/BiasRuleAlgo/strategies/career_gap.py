@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 from ..strategy_base import BiasStrategy, BiasStrategyOutput
 
@@ -56,13 +57,59 @@ def _sentences(text: str) -> list[str]:
     return [part.strip() for part in SENTENCE_SPLIT_RE.split(text) if part.strip()]
 
 
-def _contains_any(text: str, terms: set[str]) -> list[str]:
-    lowered = text.lower()
-    return [term for term in terms if term in lowered]
-
-
 def _clamp(value: float, lower: float = 0.0, upper: float = 100.0) -> float:
     return max(lower, min(upper, value))
+
+DATE_RANGE_RE = re.compile(
+    r"(19\d{2}|20\d{2})\s*(?:-|–|—|to)\s*(19\d{2}|20\d{2}|present|current)",
+    re.IGNORECASE,
+)
+
+def _has_cv_gap(cv_text: str, min_gap_years: float = 0.75, current_year: int = 2026) -> bool:
+    spans = []
+    for match in DATE_RANGE_RE.finditer(cv_text):
+        start = int(match.group(1))
+        end_raw = match.group(2).lower()
+        end = current_year if end_raw in ("present", "current") else int(end_raw)
+        spans.append((start, end))
+    spans.sort()
+    return any(b_start - a_end >= min_gap_years for (_, a_end), (b_start, _) in zip(spans, spans[1:]))
+
+
+DATE_RANGE_RE = re.compile(
+    r"(19\d{2}|20\d{2})\s*(?:-|–|—|to)\s*(19\d{2}|20\d{2}|present|current)",
+    re.IGNORECASE,
+)
+
+
+def _term_pattern(term: str) -> re.Pattern[str]:
+    return (
+        re.compile(re.escape(term), re.IGNORECASE)
+        if " " in term
+        else re.compile(r"\b" + re.escape(term) + r"\b", re.IGNORECASE)
+    )
+
+
+def _contains_any(text: str, terms: set[str]) -> list[str]:
+    lowered = text.lower()
+    return [term for term in terms if _term_pattern(term).search(lowered)]
+
+
+def _has_cv_gap(
+    cv_text: str, min_gap_years: float = 0.75, current_year: int | None = None
+) -> bool:
+    current_year = current_year or datetime.now().year
+    spans = []
+    for match in DATE_RANGE_RE.finditer(cv_text):
+        start = int(match.group(1))
+        end_raw = match.group(2).lower()
+        end = current_year if end_raw in ("present", "current") else int(end_raw)
+        spans.append((start, end))
+    spans.sort()
+    return any(
+        b_start - a_end >= min_gap_years
+        for (_, a_end), (b_start, _) in zip(spans, spans[1:])
+    )
 
 
 class CareerGapPenalty(BiasStrategy):
@@ -85,11 +132,13 @@ class CareerGapPenalty(BiasStrategy):
         gap_hits = _contains_any(feedback_text, GAP_TERMS)
         negative_hits = _contains_any(feedback_text, NEGATIVE_TIMELINE_TERMS)
         justification_hits = _contains_any(feedback_text, OBJECTIVE_JUSTIFICATION_TERMS)
+        cv_gap_confirmed = _has_cv_gap(cv_text)
 
-        if not gap_hits and not negative_hits:
+        if not gap_hits and not (negative_hits and cv_gap_confirmed):
             return BiasStrategyOutput(strategy="CareerGapPenalty", score=0, evidence=[])
 
-        base_score = 25.0
+        # lower base when the signal comes only from inferred + confirmed gap, not explicit wording
+        base_score = 25.0 if gap_hits else 15.0
         base_score += min(30.0, len(gap_hits) * 8.0)
         base_score += min(25.0, len(negative_hits) * 10.0)
         base_score += 10.0 if gap_hits and negative_hits else 0.0

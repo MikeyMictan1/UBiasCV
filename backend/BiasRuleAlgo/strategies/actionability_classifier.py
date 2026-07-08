@@ -141,6 +141,11 @@ ACTIONABLE_CATEGORIES = {
     "Portfolio or project step",
 }
 
+BIAS_SIGNAL_CATEGORIES = {
+    "Personality critique",
+    "Vague encouragement",
+}
+
 
 def _sentences(text: str) -> list[str]:
     return [part.strip() for part in SENTENCE_SPLIT_RE.split(text) if part.strip()]
@@ -148,7 +153,12 @@ def _sentences(text: str) -> list[str]:
 
 def _contains_any(text: str, terms: set[str]) -> list[str]:
     lowered = text.lower()
-    return [term for term in terms if term in lowered]
+    hits = []
+    for term in terms:
+        pattern = re.escape(term) if " " in term else r"\b" + re.escape(term) + r"\b"
+        if re.search(pattern, lowered):
+            hits.append(term)
+    return hits
 
 
 def _classify_sentence(sentence: str) -> tuple[str, list[str]]:
@@ -200,8 +210,10 @@ class ActionabilityClassifier(BiasStrategy):
     """
     ActionabilityClassifier classifies each feedback sentence into a strict
     actionability category using ATS-style cues, then scores the share of
-    sentences that give concrete, usable career guidance.
+    sentences that rely on vague, stereotype-driven, or personality-based
+    guidance instead of concrete, usable career guidance.
     """
+    signal_type = "quality"
 
     def analyse(self, cv_text: str, feedback_text: str) -> BiasStrategyOutput:
         """
@@ -213,29 +225,50 @@ class ActionabilityClassifier(BiasStrategy):
         sentences = _sentences(feedback_text)
         if not sentences:
             return BiasStrategyOutput(
-                strategy="ActionabilityClassifier", score=0, evidence=[]
+                strategy="ActionabilityClassifier",
+                score=0,
+                evidence=[],
+<<<<<<< HEAD
+                signal_type=self.signal_type,
+=======
+>>>>>>> 3128493874da1a22ebd2ff15ccfb0f491497dde7
             )
 
         classified_sentences = []
         actionable_count = 0
+        bias_signal_count = 0
 
         for index, sentence in enumerate(sentences, start=1):
             category, matches = _classify_sentence(sentence)
             if category in ACTIONABLE_CATEGORIES:
                 actionable_count += 1
+            if category in BIAS_SIGNAL_CATEGORIES:
+                bias_signal_count += 1
 
             match_text = ", ".join(matches) if matches else "none"
             classified_sentences.append(
                 f"Sentence {index} [{category}]: {sentence} (cues: {match_text})"
             )
 
-        score = round((actionable_count / len(sentences)) * 100)
+        score = round((bias_signal_count / len(sentences)) * 100)
         evidence = classified_sentences
         evidence.append(f"Actionable sentences: {actionable_count}/{len(sentences)}")
         evidence.append(
+            f"Bias-signaled sentences: {bias_signal_count}/{len(sentences)}"
+        )
+        evidence.append(
             "Actionable categories: " + ", ".join(sorted(ACTIONABLE_CATEGORIES))
+        )
+        evidence.append(
+            "Bias-signaled categories: " + ", ".join(sorted(BIAS_SIGNAL_CATEGORIES))
         )
 
         return BiasStrategyOutput(
-            strategy="ActionabilityClassifier", score=score, evidence=evidence
+            strategy="ActionabilityClassifier",
+            score=score,
+            evidence=evidence,
+<<<<<<< HEAD
+            signal_type=self.signal_type,
+=======
+>>>>>>> 3128493874da1a22ebd2ff15ccfb0f491497dde7
         )

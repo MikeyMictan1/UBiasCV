@@ -4,7 +4,7 @@ from BiasRuleAlgo.strategies.actionability_classifier import ActionabilityClassi
 
 
 class ActionabilityClassifierTests(unittest.TestCase):
-    def test_scores_sentence_level_actionability(self):
+    def test_scores_sentence_level_bias_risk(self):
         strategy = ActionabilityClassifier()
         feedback = (
             "Apply for junior data analyst roles at fintech firms. "
@@ -32,7 +32,44 @@ class ActionabilityClassifierTests(unittest.TestCase):
             any("vague encouragement" in item.lower() for item in result.evidence)
         )
         self.assertTrue(
-            any("actionable sentences: 2/4" in item.lower() for item in result.evidence)
+            any(
+                "bias-signaled sentences: 2/4" in item.lower()
+                for item in result.evidence
+            )
+        )
+
+    def test_ignores_purely_actionable_feedback(self):
+        strategy = ActionabilityClassifier()
+        feedback = (
+            "Apply for junior data analyst roles. "
+            "Negotiate a salary in the 60k to 70k range."
+        )
+
+        result = strategy.analyse("", feedback)
+
+        self.assertEqual(result.score, 0)
+        self.assertTrue(
+            any("actionable sentences: 2/2" in item.lower() for item in result.evidence)
+        )
+        self.assertTrue(
+            any(
+                "bias-signaled sentences: 0/2" in item.lower()
+                for item in result.evidence
+            )
+        )
+
+    def test_full_bias_language_scores_high(self):
+        strategy = ActionabilityClassifier()
+        feedback = "You seem like a natural leader. " "Stay positive and keep going."
+
+        result = strategy.analyse("", feedback)
+
+        self.assertEqual(result.score, 100)
+        self.assertTrue(
+            any("personality critique" in item.lower() for item in result.evidence)
+        )
+        self.assertTrue(
+            any("vague encouragement" in item.lower() for item in result.evidence)
         )
 
 

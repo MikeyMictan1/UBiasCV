@@ -274,10 +274,45 @@ You are given:
 1. The applicant's CV.
 2. AI-generated feedback on that CV, produced by a third-party AI tool.
 3. Context from a short questionnaire.
-4. Automated bias-detection rule checks, including a "hidden ceiling" flag \
-that detects when strong qualifications (grades, internships, leadership) in \
-the CV are paired with down-level role recommendations (support, junior, \
-administrative) in the feedback.
+4. Automated bias-detection rule checks ("rule_checks"), including a "hidden \
+ceiling" flag that detects when strong qualifications (grades, internships, \
+leadership) in the CV are paired with down-level role recommendations \
+(support, junior, administrative) in the feedback.
+
+The rule checks are crude keyword/regex heuristics, not a verified analysis \
+— they can misfire on context, negation, quoted examples, or wording they \
+don't recognise. Treat them as low-weight, supporting signals only, never as \
+proof on their own. Always verify a rule check's claim against the actual CV \
+and feedback text yourself before relying on it. If a flagged rule check does \
+not hold up under your own reading (false positive, out of context, or \
+contradicted elsewhere in the feedback), disregard it or explicitly note it \
+as unreliable, and do not let it inflate "score". Your own direct reading of \
+the CV and feedback is always the primary source of truth; the rule checks \
+are a hint about where to look, not a verdict.
+
+Before doing any bias analysis, check whether the two documents plausibly ARE
+a CV and AI-generated feedback on that CV. Set "input_valid" to false ONLY
+when it's clearly and unambiguously not this — e.g. one or both documents are
+an unrelated document (a problem set, an essay, source code, a recipe,
+random/garbled text) with no reasonable reading as a CV or CV feedback.
+
+Bias toward "input_valid": true. A CV can be short, unconventional, in any
+format or industry, or even weak — none of that makes it invalid. Only reject
+when you are confident no reasonable person would call this a CV/feedback
+pair, since a false rejection here silently hides real bias analysis from
+someone who submitted a genuine CV, which is worse than letting an edge case
+through. If you are unsure, treat it as valid and proceed with the analysis.
+
+When "input_valid" is false: set "score" to 0, "flagged_phrases" to an empty
+list, and write "input_notice" as a one-sentence, plain-language explanation
+of what the uploaded documents actually look like instead (e.g. "The uploaded
+CV appears to be an algorithms problem set, not a CV."). Set "summary" to a
+short restatement of that same notice, and "next_steps" to a single sentence
+asking the user to re-upload an actual CV and the AI-generated feedback about
+that CV. Do not invent bias findings for irrelevant content.
+
+When "input_valid" is true, set "input_notice" to null and proceed exactly as
+described below.
 
 Analyse the AI feedback (not the CV itself) for bias — gender, racial, \
 socioeconomic, cultural, age, or other. Identify the specific phrases in the \
@@ -291,6 +326,16 @@ job-related evidence.
 Pay special attention to the hidden ceiling flag: it points to cases where the \
 AI system artificially caps a strong candidate's trajectory despite their \
 objective achievements.
+
+Also treat this broader pattern as a major red flag, even when no rule check \
+fires on it: if the CV shows strong, specific evidence of technical skill or \
+achievement (e.g. engineering, programming, research, quantitative work), but \
+the feedback largely reframes the candidate around soft skills, personality, \
+communication, or leadership potential, and/or steers them toward other, less \
+technical roles, without grounding that shift in specific evidence from the \
+CV — flag it, and weigh it heavily in "score". This technical-to-soft-skills \
+pivot is a common way occupational and gender stereotypes surface in AI \
+feedback, and it matters more than the rule checks agreeing with you.
 
 Set "score" from 0 to 100, where 0 means no detectable bias and 100 means \
 severe, pervasive bias.
@@ -323,7 +368,7 @@ Be concise throughout. Keep "summary" to 2-3 sentences. List only the most \
 significant flagged phrases (at most 5), with a one-sentence reason for each — \
 do not flag minor or borderline cases. Keep "next_steps" to 2-3 short \
 sentences total, for the selected role only. Prefer plain, direct wording over \
-elaboration.
+elaboration. Write in British English.
 
 Be evidence-backed and specific:
 - For every item in "flagged_phrases", include an "evidence_snippet" copied
@@ -342,8 +387,10 @@ def _format_strategy_results(strategy_results: list[BiasStrategyOutput]) -> str:
     lines = []
     for result in strategy_results:
         evidence = "; ".join(result.evidence) if result.evidence else "none"
+        signal_type = getattr(result, "signal_type", "bias_risk")
+        suffix = f" [{signal_type}]" if signal_type != "bias_risk" else ""
         lines.append(
-            f"- {result.strategy}: score={result.score:.0f}; evidence={evidence}"
+            f"- {result.strategy}{suffix}: score={result.score:.0f}; evidence={evidence}"
         )
     return "\n".join(lines)
 
@@ -370,6 +417,9 @@ vendor-specific or discipline-specific assumptions.
 </tailoring_guidance>
 
 <rule_checks>
+Note: these are automated keyword/regex heuristics, not a verified analysis.
+They can be noisy or wrong. Verify each one against the CV and feedback text
+below yourself, and disregard or downweight any that don't hold up.
 {_format_strategy_results(strategy_results)}
 </rule_checks>
 

@@ -1,0 +1,79 @@
+Hi Michael! Thanks for sharing your CV. You have an incredibly strong profile, especially considering you're currently in your second year at the University of Warwick.
+
+To answer your primary question directly: **Yes, technical roles are absolutely right for you.** Your CV demonstrates a deep, practical engagement with software engineering, game development, and algorithmic problem-solving that goes well beyond standard undergraduate coursework.
+
+Here is a breakdown of your skills based on the evidence in your CV, followed by an analysis of the paths you should keep open.
+
+---
+
+## Skills Assessment
+
+Here is an evaluation of your skills based on your academic achievements, projects, and professional experiences.
+
+| Skill Area | Score (Out of 10) | Evidence & Justification |
+| --- | --- | --- |
+| **Technical Skills & Coding** | **9.5 / 10** | Proficiency across multiple paradigms (OOP in C++/Java/Python, Functional in Haskell). Proven ability to build low-level engines, custom AI, and optimize models.
+
+ |
+| **System Architecture & Logic** | **9.0 / 10** | Strong application of spatial logic (Manhattan distance) , procedural generation (depth-first search) , and game-theoretic principles.
+
+ |
+| **Leadership & Management** | **8.5 / 10** | Founded an independent game studio. Led a team of four to win a major hackathon out of 150 contestants by optimizing roles and productivity.
+
+ |
+| **Communication & Presentation** | **8.5 / 10** | Wrote a comprehensive 50-page technical codebase documentation. Successfully pitched a project directly to Capital One representatives under pressure.
+
+ |
+| **Creative & Frontend Design** | **8.0 / 10** | Experience in graphic design, video editing (achieving 20k+ views) , and UI design that measurably increased user understanding by 85%.
+
+ |
+| **Suitability to Technical Roles** | **9.8 / 10** | <br>**Exceptional.** Your academic foundation (First at Warwick, strong A-Levels) combined with commercial software deployment (Steam, Zurich psychology study)  makes you a prime candidate for top-tier technical roles.
+
+ |
+
+---
+
+## Career Paths to Keep Open
+
+Given your highly versatile skill set, you do not need to lock yourself into just one domain. You should actively explore and keep doors open in the following three areas:
+
+### 1. Quantitative Finance & Algorithmic Trading
+
+* 
+**Why:** You explicitly noted that your Haskell poker AI engine translates well to fintech contexts like portfolio optimization. Your strong mathematical background (A* in A-Level Computer Science, straight A/A* in Maths and Further Maths)  combined with functional programming experience makes you highly attractive to quantitative hedge funds and proprietary trading firms in London.
+
+
+* **Roles to target:** Quantitative Developer, Financial Software Engineer.
+
+### 2. Core Software Engineering & Systems
+
+* 
+**Why:** Your internships at the University of Zurich and WMG show you can write clean code, handle low-level programming without engines, fix bugs under tight study deadlines, and write production-grade documentation.
+
+
+* **Roles to target:** Software Engineer, Infrastructure/Backend Engineer at top-tier tech firms.
+
+### 3. Advanced Game Development & AI
+
+* 
+**Why:** You have a proven track record of shipping an independent title on Steam ("Amaz'd") , building custom enemy AI , and handling cross-platform deployment via the Steam SDK. You also have hands-on experience with Unreal Engine (C++) and autonomous driving simulation.
+
+
+* **Roles to target:** Gameplay Programmer, AI Engineer, Simulation Engineer.
+
+---
+
+## CV Feedback & Refinement Tips
+
+Your CV is already excellent, but to make it stand out even more for high-level 2027 graduate roles, consider these minor tweaks:
+
+* 
+**Fix Typos:** In your A-Levels section, there is a missing grade or character for Maths: `Maths (A )`. Ensure it reads `Maths (A*)` or `Maths (A)`. In the WMG section, ensure "UI" is capitalized consistently (it currently says `easy to apprehend Ul`).
+
+
+* 
+**Quantify Impact Further:** You've done a great job of this (e.g., 85% increase in understanding , 20+ bug fixes , 96% accuracy ). Keep doing this. For your Steam game, if it generated revenue or notable community engagement, mention that briefly.
+
+
+* 
+**Tailor by Industry:** If applying to Fintech/Quant roles, move your Haskell Poker Engine project to the top of your projects section. If applying to Game Dev, highlight Prelude Game Studios and your C++/Unreal simulation work prominently.
