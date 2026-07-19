@@ -1,8 +1,9 @@
 // ============================================================
 // Footer
 // Cream bar at the bottom of every page with the policy link.
-// The framework link downloads a zip containing framework.pdf and
-// policy.pdf; Privacy Policy navigates to the in-app PrivacyPolicyPage.
+// The framework link downloads a zip containing the Responsible AI Policy
+// and the Gender Bias Risk Assessment Toolkit PDFs; Privacy Policy
+// navigates to the in-app PrivacyPolicyPage.
 // ============================================================
 
 import type { PageName } from '../App'
